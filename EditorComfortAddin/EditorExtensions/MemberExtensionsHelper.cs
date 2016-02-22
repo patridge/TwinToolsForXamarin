@@ -86,7 +86,7 @@ namespace TwinTechs.EditorExtensions
 			if (member != null) {
 				var memberType = selectedMember as IUnresolvedEntity;
 				var region = memberType.Region;
-				editor.SetCaretTo (region.BeginLine, region.BeginColumn, true, false);
+				editor.SetCaretTo (region.BeginLine, region.BeginColumn, true, true);
 				editor.ScrollToCaret ();
 			}
 		}

@@ -86,8 +86,8 @@ namespace TwinTechs.EditorExtensions
 			if (member != null) {
 				var memberType = selectedMember as IUnresolvedEntity;
 				var region = memberType.Region;
-				editor.SetCaretTo (region.BeginLine, region.BeginColumn, true, true);
-				editor.ScrollToCaret ();
+				editor.SetCaretTo (region.BeginLine, region.BeginColumn, true, false);
+				editor.CenterToCaret ();
 			}
 		}
 
@@ -106,7 +106,6 @@ namespace TwinTechs.EditorExtensions
 				if (!(entity is IUnresolvedTypeDefinition)) {
 					if (entity.Region.Contains (editor.Caret.Location)) {
 						return entity;
-						break;
 					}
 				}
 			}

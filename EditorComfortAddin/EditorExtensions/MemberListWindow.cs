@@ -19,6 +19,7 @@ using System.Runtime.InteropServices;
 using Mono.CSharp;
 using Mono.CSharp.Linq;
 using ICSharpCode.NRefactory.TypeSystem.Implementation;
+using MonoDevelop.Ide.TypeSystem;
 
 namespace TwinTechs.EditorExtensions
 {
@@ -244,8 +245,10 @@ namespace TwinTechs.EditorExtensions
 			typeColumn.Title = "Type";
 			typeColumn.MaxWidth = 50;
 			// Do the same for the song title column
-			var typeCell = new Gtk.CellRendererText ();
+			var typeCell = new CellRendererImage ();
 			typeColumn.PackStart (typeCell, true);
+			typeColumn.SetCellDataFunc (typeCell, ResultTypeIconFunc);
+
 
 			//name
 			var nameColumn = new Gtk.TreeViewColumn ();
@@ -254,27 +257,15 @@ namespace TwinTechs.EditorExtensions
 			var nameCell = new Gtk.CellRendererText ();
 			nameColumn.PackStart (nameCell, true);
 
-			//info
-			var infoColumn = new Gtk.TreeViewColumn ();
-			infoColumn.Title = "Info";
-			infoColumn.MaxWidth = 150;
-			var infoCell = new Gtk.CellRendererText ();
-			infoColumn.PackStart (infoCell, true);
-
-
-
 			// Add the columns to the TreeView
 			_treeView.AppendColumn (typeColumn);
 			_treeView.AppendColumn (nameColumn);
-			_treeView.AppendColumn (infoColumn);
 
 			typeColumn.AddAttribute (typeCell, "text", 0);
 			nameColumn.AddAttribute (nameCell, "text", 1);
-			infoColumn.AddAttribute (infoCell, "text", 2);
 
 			_treeView.Selection.Mode = Gtk.SelectionMode.Single;
 			_treeView.Selection.Changed += _treeView_Selection_Changed;
-
 
 			_treeView.KeyPressEvent += HandleKeyPressEvent;
 			_treeView.KeyReleaseEvent += HandleKeyReleaseEvent;
@@ -283,7 +274,24 @@ namespace TwinTechs.EditorExtensions
 					CloseWindow (true);
 				}
 			};
+		}
 
+		void ResultTypeIconFunc (TreeViewColumn column, CellRenderer cell, TreeModel model, TreeIter iter)
+		{
+			if (TreeIter.Zero.Equals (iter))
+				return;
+			
+			var typeCell = (CellRendererImage)cell;
+
+			var searchResult = (string)_listStore.GetValue (iter, 0);
+			if (searchResult == null)
+				return;
+
+			var icon = ImageService.GetIcon (searchResult, Gtk.IconSize.Menu);
+			if (icon == null) {
+				return;
+			}
+			typeCell.Image = icon;
 		}
 
 		void _treeView_Selection_Changed (object sender, EventArgs e)
@@ -316,6 +324,8 @@ namespace TwinTechs.EditorExtensions
 			_searchView.FocusOutEvent -= HandleFocusOutEvent;
 
 			Visible = false;
+			_listStore.Dispose ();
+
 			Destroy ();
 		}
 
@@ -327,29 +337,24 @@ namespace TwinTechs.EditorExtensions
 			if (string.IsNullOrEmpty (filterText)) {
 				_filteredEntities = entities;
 			} else {
-				
-				var filteredEntities = entities.Where (e => {
-					return MemberMatchingHelper.GetMatchWithSearchText (filterText, e.Name);
-				}).ToList ();
+				var filteredEntities = entities.Where (e => MemberMatchingHelper.GetMatchWithSearchText (filterText, e.Name)).ToList ();
 				_filteredEntities = new Collection<IUnresolvedEntity> (filteredEntities);
 			}
+
 			foreach (var entity in _filteredEntities) {
-				//TODO improve this
-				var info = "";
-				var method = entity as DefaultUnresolvedMethod;
-				if (method != null) {
-					
-					var typeInfo = method.Parameters.Select ((arg) => {
-						return arg.Name + ":" + arg.Type.ToString ();
-					}
-					               );
-					info = "(" + String.Join (" , ", typeInfo) + " )";
-				}
+
+				string parameters = GetParameters (entity);
+
 				var name = entity.Name;
 				if (name == ".ctor") {
-					name = "*" + entity.DeclaringTypeDefinition.Name;
+					name = "* " + entity.DeclaringTypeDefinition.Name;
 				}
-				_listStore.AppendValues (entity.SymbolKind.ToString ().Substring (0, 1), name, info);
+
+				string returnType = GetFormattedReturnType (entity);
+
+				var iconName = entity.GetStockIcon ();
+
+				_listStore.AppendValues (iconName, name + parameters + returnType);
 			}
 			_treeView.Model = _listStore;
 
@@ -359,6 +364,31 @@ namespace TwinTechs.EditorExtensions
 			} else {
 				SelectRowIndex (0);
 			}
+		}
+
+		static string GetParameters (IUnresolvedEntity entity)
+		{
+			var info = string.Empty;
+
+			var method = entity as DefaultUnresolvedMethod;
+			if (method != null) {
+				var typeInfo = method.Parameters.Select (p => p.Type.ToString ());
+				info = string.Format ("({0})", string.Join (", ", typeInfo));
+			}
+			return info;
+		}
+
+
+		static string GetFormattedReturnType (IUnresolvedEntity entity)
+		{
+			string returnSignature = string.Empty;
+			var method = entity as AbstractUnresolvedMember;
+
+			if (method != null && method.ReturnType.ToString () != "void") {
+				returnSignature = string.Format (" : {0}", method.ReturnType);
+			}
+
+			return returnSignature;
 		}
 
 		#endregion

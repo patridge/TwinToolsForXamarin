@@ -55,6 +55,8 @@
     <Compile Include="TwinTechs\EditorExtensions\View\MemberListWindow.cs" />
     <Compile Include="TwinTechs\EditorExtensions\View\MemberMatchingHelper.cs" />
     <Compile Include="TwinTechs\EditorExtensions\View\RecentFileListWindow.cs" />
+    <Compile Include="TwinTechs\EditorExtensions\Commands\GotoMemberImplementation.cs" />
+    <Compile Include="TwinTechs\EditorExtensions\Helpers\RootWorkspaceExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Manifest.addin.xml" />
@@ -79,6 +81,7 @@
     <Folder Include="TwinTechs\EditorExtensions\Commands\" />
     <Folder Include="TwinTechs\EditorExtensions\Helpers\" />
     <Folder Include="TwinTechs\EditorExtensions\View\" />
+    <Folder Include="TwinTechs\EditorExtensions\Extensions\" />
   </ItemGroup>
   <ProjectExtensions>
     <MonoDevelop>

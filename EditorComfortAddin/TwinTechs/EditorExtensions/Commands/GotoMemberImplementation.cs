@@ -1,19 +1,21 @@
 using System;
 using MonoDevelop.Components.Commands;
 using MonoDevelop.Ide;
-using TwinTechs.EditorExtensions.View;
 using TwinTechs.EditorExtensions.Helpers;
 
 namespace TwinTechs.EditorExtensions.Commands
 {
-	public class ShowMembers : CommandHandler
+	/**
+	 * Will navigate to the implementation of the member, instead of the interface
+	 */
+	public class GotoMemberImplementation : CommandHandler
 	{
 		protected override void Run ()
 		{
-			if (IdeApp.Workbench?.ActiveDocument != null) {
-				var memberListWindow = new MemberListWindow ("Members", IdeApp.Workbench.RootWindow, Gtk.DialogFlags.Modal);
-				memberListWindow.Run ();
-			}
+			//1. identify if the member belongs to an interface
+			var entity = MemberExtensionsHelper.Instance.GetEntityAtCaret ();
+			//2. find classes that implement the interface
+			//3. go to member in that class
 		}
 
 		protected override void Update (CommandInfo info)
@@ -21,6 +23,7 @@ namespace TwinTechs.EditorExtensions.Commands
 			var isEnabled = IdeApp.Workspace.GetIsWorkspaceOpen () && IdeApp.Workspace.GetIsDocumentOpen ();
 
 			info.Enabled = isEnabled;
+
 			info.Visible = true;
 		}
 	}

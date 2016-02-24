@@ -15,7 +15,8 @@ namespace TwinTechs.EditorExtensions.Commands
 
 		protected override void Update (CommandInfo info)
 		{
-			info.Enabled = true;
+			var isEnabled = IdeApp.Workspace.GetIsWorkspaceOpen () && IdeApp.Workspace.GetIsDocumentOpen ();
+			info.Enabled = isEnabled;
 			info.Visible = true;
 		}
 	}

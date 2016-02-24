@@ -11,7 +11,8 @@ namespace TwinTechs.EditorExtensions.Commands
 		protected override void Run ()
 		{
 			if (IdeApp.Workbench?.ActiveDocument != null) {
-				var memberListWindow = new MemberListWindow ("Members", IdeApp.Workbench.RootWindow, Gtk.DialogFlags.Modal);
+				var closestEntity = MemberExtensionsHelper.Instance.GetNearestEntity (false);
+				var memberListWindow = new MemberListWindow ("Members", IdeApp.Workbench.RootWindow, Gtk.DialogFlags.Modal, closestEntity);
 				memberListWindow.Run ();
 			}
 		}

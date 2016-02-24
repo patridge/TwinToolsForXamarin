@@ -9,7 +9,7 @@ using MonoDevelop.Core;
 using System.IO;
 using Mono.CSharp;
 
-namespace TwinTechs.EditorExtensions
+namespace TwinTechs.EditorExtensions.Helpers
 {
 
 	internal class MemberExtensionsHelper

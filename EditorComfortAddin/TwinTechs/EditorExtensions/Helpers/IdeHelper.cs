@@ -2,7 +2,7 @@
 using MonoDevelop.Ide;
 using MonoDevelop.Ide.Gui;
 
-namespace TwinTechs.EditorExtensions
+namespace TwinTechs.EditorExtensions.Helpers
 {
 	public static class IdeHelper
 	{

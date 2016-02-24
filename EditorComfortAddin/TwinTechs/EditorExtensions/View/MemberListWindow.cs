@@ -20,8 +20,9 @@ using Mono.CSharp;
 using Mono.CSharp.Linq;
 using ICSharpCode.NRefactory.TypeSystem.Implementation;
 using MonoDevelop.Ide.TypeSystem;
+using TwinTechs.EditorExtensions.Helpers;
 
-namespace TwinTechs.EditorExtensions
+namespace TwinTechs.EditorExtensions.View
 {
 
 	public class MemberListWindow : Gtk.Dialog

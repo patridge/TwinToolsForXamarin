@@ -9,7 +9,7 @@ using System.IO;
 using System.Linq;
 using MonoDevelop.Projects;
 
-namespace TwinTechs.EditorExtensions
+namespace TwinTechs.EditorExtensions.Helpers
 {
 	public class FileHistoryHelper
 	{

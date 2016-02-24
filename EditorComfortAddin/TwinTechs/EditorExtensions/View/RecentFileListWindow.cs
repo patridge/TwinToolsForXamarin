@@ -16,8 +16,9 @@ using System.Collections;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Runtime.InteropServices;
+using TwinTechs.EditorExtensions.Helpers;
 
-namespace TwinTechs.EditorExtensions
+namespace TwinTechs.EditorExtensions.View
 {
 
 	public class RecentFileListWindow : Gtk.Dialog

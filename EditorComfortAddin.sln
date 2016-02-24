@@ -3,15 +3,45 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EditorComfortAddin", "EditorComfortAddin\EditorComfortAddin.csproj", "{EB1A8C73-75D5-442D-8382-4676F0A82BE5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EditorComfortAddinTests", "EditorComfortAddinTests\EditorComfortAddinTests.csproj", "{4CE51350-EF95-4791-9B1F-39077C91ACB2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4CE51350-EF95-4791-9B1F-39077C91ACB2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4CE51350-EF95-4791-9B1F-39077C91ACB2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4CE51350-EF95-4791-9B1F-39077C91ACB2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4CE51350-EF95-4791-9B1F-39077C91ACB2}.Release|Any CPU.Build.0 = Release|Any CPU
 		{EB1A8C73-75D5-442D-8382-4676F0A82BE5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{EB1A8C73-75D5-442D-8382-4676F0A82BE5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EB1A8C73-75D5-442D-8382-4676F0A82BE5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EB1A8C73-75D5-442D-8382-4676F0A82BE5}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		Policies = $0
+		$0.TextStylePolicy = $1
+		$1.inheritsSet = Mono
+		$1.inheritsScope = text/plain
+		$1.scope = application/xml
+		$0.XmlFormattingPolicy = $2
+		$2.DefaultFormat = $3
+		$3.MaxAttributesPerLine = 1
+		$3.AlignAttributes = True
+		$3.EmptyLinesBeforeStart = 1
+		$2.inheritsSet = Mono
+		$2.inheritsScope = application/xml
+		$2.scope = application/xml
+		$0.TextStylePolicy = $4
+		$4.inheritsSet = null
+		$4.scope = application/x-addin+xml
+		$0.XmlFormattingPolicy = $5
+		$5.inheritsSet = null
+		$5.scope = application/x-addin+xml
+		$0.StandardHeader = $6
+		$6.Text = 
+		$6.IncludeInNewFiles = True
 	EndGlobalSection
 EndGlobal

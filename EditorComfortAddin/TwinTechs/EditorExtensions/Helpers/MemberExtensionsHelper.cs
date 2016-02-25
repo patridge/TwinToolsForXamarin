@@ -99,7 +99,6 @@ namespace TwinTechs.EditorExtensions.Helpers
 		{
 			var editor = IdeApp.Workbench.ActiveDocument.Editor;
 
-			var parsedDoc = IdeApp.Workbench.ActiveDocument.ParsedDocument;
 			//TODO cache these bad boys
 			var entities = GetEntities ();
 			foreach (var entity in entities) {

@@ -20,10 +20,17 @@
 
 		<Command id="TwinTechs.EditorExtensions.Commands.NextMember"
 			_label="Next Membber"
-			_description="Next Membber"
+			_description="Next Member"
 			shortcut="Ctrl|Down"
 			macShortcut="Ctrl|Down"
 			defaultHandler="TwinTechs.EditorExtensions.Commands.NextMember" />
+
+		<Command id="TwinTechs.EditorExtensions.Commands.GotoMemberImplementation"
+			_label="Go to implementation"
+			_description="Go to implementation"
+			shortcut="Meta|Ctrl|o"
+			macShortcut="Meta|Ctrl|o"
+			defaultHandler="TwinTechs.EditorExtensions.Commands.GotoMemberImplementation" />
 
 		<Command id="TwinTechs.EditorExtensions.Commands.ToggleViewModel"
 			_label="Cycle VM/Xaml/.cs"
@@ -54,6 +61,8 @@
 		<CommandItem id="TwinTechs.EditorExtensions.Commands.PreviousMember" />
 
 		<CommandItem id="TwinTechs.EditorExtensions.Commands.NextMember" />
+
+		<CommandItem id="TwinTechs.EditorExtensions.Commands.GotoMemberImplementation" />
 
 		<CommandItem id="TwinTechs.EditorExtensions.Commands.ToggleViewModel" />
 

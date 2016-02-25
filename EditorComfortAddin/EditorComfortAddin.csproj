@@ -58,6 +58,9 @@
     <Compile Include="TwinTechs\EditorExtensions\Commands\GotoMemberImplementation.cs" />
     <Compile Include="TwinTechs\EditorExtensions\Helpers\RootWorkspaceExtensions.cs" />
     <Compile Include="TwinTechs\EditorExtensions\Extensions\IEnumerableExtensions.cs" />
+    <Compile Include="TwinTechs\EditorExtensions\Helpers\NavigationHelper.cs" />
+    <Compile Include="TwinTechs\EditorExtensions\Model\SearchCollector.cs" />
+    <Compile Include="TwinTechs\EditorExtensions\Model\FindDerivedSymbolsHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Manifest.addin.xml" />
@@ -83,6 +86,7 @@
     <Folder Include="TwinTechs\EditorExtensions\Helpers\" />
     <Folder Include="TwinTechs\EditorExtensions\View\" />
     <Folder Include="TwinTechs\EditorExtensions\Extensions\" />
+    <Folder Include="TwinTechs\EditorExtensions\Model\" />
   </ItemGroup>
   <ProjectExtensions>
     <MonoDevelop>

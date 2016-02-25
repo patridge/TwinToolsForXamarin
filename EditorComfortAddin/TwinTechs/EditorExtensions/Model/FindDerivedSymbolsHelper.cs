@@ -14,6 +14,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using MonoDevelop.Refactoring;
+using TwinTechs.EditorExtensions.Helpers;
 
 namespace TwinTechs.EditorExtensions.Model
 {
@@ -118,8 +119,11 @@ namespace TwinTechs.EditorExtensions.Model
 					_didFindFirstResult = true;
 					_currentMemberReference = memberReference;
 					NavigateToCurrentDocument ();
+				} else {
+					StatusHelper.ShowStatus (MonoDevelop.Ide.Gui.Stock.OpenFileIcon, GetStatusText ());
 				}
 				_foundMemberReferences.Add (memberReference);
+
 			}
 		}
 
@@ -186,9 +190,18 @@ namespace TwinTechs.EditorExtensions.Model
 		{
 			Gtk.Application.Invoke (delegate {
 				IdeApp.Workbench.OpenDocument (_currentMemberReference.FileName, null, _currentMemberReference.Region.BeginLine, _currentMemberReference.Region.BeginColumn, OpenDocumentOptions.Default);
-				IdeApp.Workbench.StatusBar.ShowMessage (MonoDevelop.Ide.Gui.Stock.OpenFileIcon, _currentMemberReference.FileName);
 			});
-			ClearStatusAfterDelay ();
+			StatusHelper.ShowStatus (MonoDevelop.Ide.Gui.Stock.OpenFileIcon, GetStatusText ());
+		}
+
+		static string GetStatusText ()
+		{
+			var message = GetNameWithoutLastBit (_currentMemberReference.FileName);
+			if (_foundMemberReferences?.Count > 1) {
+				var currentIndex = _foundMemberReferences.IndexOf (_currentMemberReference);
+				message += "(" + (currentIndex + 1) + "/" + _foundMemberReferences.Count + ")";
+			}
+			return message;
 		}
 
 		static string GetNameWithoutLastBit (string name)
@@ -198,29 +211,6 @@ namespace TwinTechs.EditorExtensions.Model
 				name = name.Substring (0, lastDotPosition);
 			}
 			return name;
-		}
-
-		static System.Timers.Timer _timer;
-
-		static void ClearStatusAfterDelay ()
-		{
-			if (_timer != null) {
-				_timer.Elapsed -= _timer_Elapsed;
-				_timer.Stop ();
-			}
-			_timer = new System.Timers.Timer ();
-			_timer.Elapsed += _timer_Elapsed;
-			_timer.Interval = 10000;
-			_timer.AutoReset = false;
-			_timer.Start ();
-		}
-
-		static void _timer_Elapsed (object sender, System.Timers.ElapsedEventArgs e)
-		{
-			Gtk.Application.Invoke (delegate {
-				IdeApp.Workbench.StatusBar.ShowMessage ("");
-			});
-			_timer = null;
 		}
 	}
 

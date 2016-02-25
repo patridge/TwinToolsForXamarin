@@ -11,7 +11,6 @@ namespace TwinTechs.EditorExtensions.Commands
 		protected override void Run ()
 		{
 			MemberExtensionsHelper.Instance.GotoPreviousEntity ();
-
 		}
 
 		protected override void Update (CommandInfo info)

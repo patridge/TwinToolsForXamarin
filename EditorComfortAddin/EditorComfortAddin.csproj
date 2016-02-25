@@ -61,6 +61,7 @@
     <Compile Include="TwinTechs\EditorExtensions\Helpers\NavigationHelper.cs" />
     <Compile Include="TwinTechs\EditorExtensions\Model\SearchCollector.cs" />
     <Compile Include="TwinTechs\EditorExtensions\Model\FindDerivedSymbolsHelper.cs" />
+    <Compile Include="TwinTechs\EditorExtensions\Helpers\StatusHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Manifest.addin.xml" />

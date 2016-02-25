@@ -4,6 +4,20 @@
 
 	<Extension path="/MonoDevelop/Ide/Commands">
 
+		<Command id="TwinTechs.EditorExtensions.Commands.BrowseRecentDocument"
+			_label="Browse recent documents"
+			_description="Browse recently opened documents"
+			shortcut="Meta|E"
+			macShortcut="Meta|E"
+			defaultHandler="TwinTechs.EditorExtensions.Commands.ShowRecentDocumentBrowser" />
+
+		<Command id="TwinTechs.EditorExtensions.Commands.GotoMemberImplementation"
+			_label="Go to Declaration+"
+			_description="Advanced version of go to declaration. Can go direct to implementing classes, and some Xaml types."
+			shortcut="Meta|b"
+			macShortcut="Meta|b"
+			defaultHandler="TwinTechs.EditorExtensions.Commands.GotoMemberImplementation" />
+
 		<Command id="TwinTechs.EditorExtensions.Commands.ShowMembers"
 			_label="Show Members"
 			_description="Toggle members"
@@ -11,50 +25,44 @@
 			macShortcut="Ctrl|F12"
 			defaultHandler="TwinTechs.EditorExtensions.Commands.ShowMembers" />
 
-		<Command id="TwinTechs.PreviousMember"
+		<Command id="TwinTechs.EditorExtensions.Commands.PreviousMember"
 			_label="Previous Member"
-			_description="Previous Member"
+			_description="Goes to the previous member in a code file"
 			shortcut="Ctrl|Up"
 			macShortcut="Ctrl|Up"
 			defaultHandler="TwinTechs.EditorExtensions.Commands.PreviousMember" />
 
 		<Command id="TwinTechs.EditorExtensions.Commands.NextMember"
-			_label="Next Membber"
-			_description="Next Member"
+			_label="Next Member"
+			_description="Goes to the next member in a code file"
 			shortcut="Ctrl|Down"
 			macShortcut="Ctrl|Down"
 			defaultHandler="TwinTechs.EditorExtensions.Commands.NextMember" />
 
-		<Command id="TwinTechs.EditorExtensions.Commands.GotoMemberImplementation"
-			_label="Go to implementation"
-			_description="Go to implementation"
-			shortcut="Meta|Ctrl|o"
-			macShortcut="Meta|Ctrl|o"
-			defaultHandler="TwinTechs.EditorExtensions.Commands.GotoMemberImplementation" />
-
 		<Command id="TwinTechs.EditorExtensions.Commands.ToggleViewModel"
-			_label="Cycle VM/Xaml/.cs"
+			_label="Cycle VM/Xaml"
 			_description="Cycles between the vm and xaml file"
 			shortcut="Shift|Meta|F9"
 			macShortcut="Shift|Meta|F9"
 			defaultHandler="TwinTechs.EditorExtensions.Commands.ToggleViewModel" />
 
 		<Command id="TwinTechs.EditorExtensions.Commands.ToggleViewModelPreferCodeBehind"
-			_label="Cycle VM/Xaml/.cs"
+			_label="Cycle VM/code behind"
 			_description="Will cycle through the vm and code behind file"
 			shortcut="Shift|Meta|F10"
 			macShortcut="Shift|Meta|F10"
 			defaultHandler="TwinTechs.EditorExtensions.Commands.ToggleViewModelPreferCodeBehind" />
-
-		<Command id="TwinTechs.EditorExtensions.Commands.BrowseRecentDocument"
-			_label="Browse Recent Documents"
-			_description="Browse Recent Documents"
-			shortcut="Meta|E"
-			macShortcut="Meta|E"
-			defaultHandler="TwinTechs.EditorExtensions.Commands.ShowRecentDocumentBrowser" />
 	</Extension>
 
 	<Extension path="/MonoDevelop/Ide/MainMenu/Search">
+
+		<SeparatorItem id="TwinAddinsSeparator1" />
+
+		<CommandItem id="TwinTechs.EditorExtensions.Commands.GotoMemberImplementation" />
+
+		<CommandItem id="TwinTechs.EditorExtensions.Commands.BrowseRecentDocument" />
+
+		<SeparatorItem id="TwinAddinsSeparator2" />
 
 		<CommandItem id="TwinTechs.EditorExtensions.Commands.ShowMembers" />
 
@@ -62,12 +70,10 @@
 
 		<CommandItem id="TwinTechs.EditorExtensions.Commands.NextMember" />
 
-		<CommandItem id="TwinTechs.EditorExtensions.Commands.GotoMemberImplementation" />
+		<SeparatorItem id="TwinAddinsSeparator3" />
 
 		<CommandItem id="TwinTechs.EditorExtensions.Commands.ToggleViewModel" />
 
 		<CommandItem id="TwinTechs.EditorExtensions.Commands.ToggleViewModelPreferCodeBehind" />
-
-		<CommandItem id="TwinTechs.EditorExtensions.Commands.BrowseRecentDocument" />
 	</Extension>
 </ExtensionModel>

@@ -45,9 +45,7 @@ namespace TwinTechs.EditorExtensions.Model
 				var currentIndex = _foundMemberReferences.IndexOf (_currentMemberReference);
 				currentIndex = currentIndex == _foundMemberReferences.Count - 1 ? 0 : currentIndex + 1;
 				_currentMemberReference = _foundMemberReferences [currentIndex];
-				Gtk.Application.Invoke (delegate {
-					IdeApp.Workbench.OpenDocument (_currentMemberReference.FileName, null, _currentMemberReference.Region.BeginLine, _currentMemberReference.Region.BeginColumn, OpenDocumentOptions.Default);
-				});
+				NavigateToCurrentDocument ();
 			}
 		}
 
@@ -119,9 +117,7 @@ namespace TwinTechs.EditorExtensions.Model
 				if (!_didFindFirstResult) {
 					_didFindFirstResult = true;
 					_currentMemberReference = memberReference;
-					Gtk.Application.Invoke (delegate {
-						IdeApp.Workbench.OpenDocument (memberReference.FileName, null, memberReference.Region.BeginLine, memberReference.Region.BeginColumn, OpenDocumentOptions.Default);
-					});
+					NavigateToCurrentDocument ();
 				}
 				_foundMemberReferences.Add (memberReference);
 			}
@@ -184,6 +180,47 @@ namespace TwinTechs.EditorExtensions.Model
 			_currentMemberReference = null;
 			_foundMemberReferences = new List<MemberReference> ();
 			_didFindFirstResult = false;
+		}
+
+		static void NavigateToCurrentDocument ()
+		{
+			Gtk.Application.Invoke (delegate {
+				IdeApp.Workbench.OpenDocument (_currentMemberReference.FileName, null, _currentMemberReference.Region.BeginLine, _currentMemberReference.Region.BeginColumn, OpenDocumentOptions.Default);
+				IdeApp.Workbench.StatusBar.ShowMessage (MonoDevelop.Ide.Gui.Stock.OpenFileIcon, _currentMemberReference.FileName);
+			});
+			ClearStatusAfterDelay ();
+		}
+
+		static string GetNameWithoutLastBit (string name)
+		{
+			int lastDotPosition = name.LastIndexOf (".");
+			if (lastDotPosition >= 0) {
+				name = name.Substring (0, lastDotPosition);
+			}
+			return name;
+		}
+
+		static System.Timers.Timer _timer;
+
+		static void ClearStatusAfterDelay ()
+		{
+			if (_timer != null) {
+				_timer.Elapsed -= _timer_Elapsed;
+				_timer.Stop ();
+			}
+			_timer = new System.Timers.Timer ();
+			_timer.Elapsed += _timer_Elapsed;
+			_timer.Interval = 10000;
+			_timer.AutoReset = false;
+			_timer.Start ();
+		}
+
+		static void _timer_Elapsed (object sender, System.Timers.ElapsedEventArgs e)
+		{
+			Gtk.Application.Invoke (delegate {
+				IdeApp.Workbench.StatusBar.ShowMessage ("");
+			});
+			_timer = null;
 		}
 	}
 

@@ -33,6 +33,9 @@ namespace TwinTechs.EditorExtensions.View
 		Gtk.TreeView _treeView;
 		Gtk.Entry _searchView;
 		Gtk.ListStore _listStore;
+
+		ScrolledWindow _scrolledWindow;
+
 		bool keyHandled = false;
 		Collection<IUnresolvedEntity> _filteredEntities;
 
@@ -54,7 +57,10 @@ namespace TwinTechs.EditorExtensions.View
 			VBox.Add (_searchView);
 
 			CreateTree ();
-			VBox.Add (_treeView);
+			_scrolledWindow = new Gtk.ScrolledWindow ();
+			_scrolledWindow.SetSizeRequest (500, 600);
+			_scrolledWindow.Add (_treeView);
+			VBox.Add (_scrolledWindow);
 
 			MemberExtensionsHelper.Instance.IsDirty = true;
 			UpdateMembers ();
@@ -307,10 +313,24 @@ namespace TwinTechs.EditorExtensions.View
 				SelectedEntity = _filteredEntities [index];
 				_selectedIndex = index;
 			}
+			UpdateSrollPosition ();
 			_searchView.GrabFocus ();
 			_searchView.SelectRegion (_searchView.Text.Length, _searchView.Text.Length);
 		}
 
+		void UpdateSrollPosition ()
+		{
+			var rowHeight = (_scrolledWindow.Vadjustment.Upper - 22) / _filteredEntities.Count;
+			var newOffset = _selectedIndex * rowHeight;
+			var currentLower = _scrolledWindow.Vadjustment.Value;
+			var currentUpper = _scrolledWindow.Vadjustment.Value + _scrolledWindow.Vadjustment.PageSize;
+
+			if (newOffset <= currentLower) {
+				_scrolledWindow.Vadjustment.Value = newOffset;
+			} else if (newOffset >= currentUpper - (_scrolledWindow.Vadjustment.PageSize / 2)) {
+				_scrolledWindow.Vadjustment.Value = newOffset - (_scrolledWindow.Vadjustment.PageSize / 2);
+			}
+		}
 
 		void CloseWindow (bool moveToSelectedEntry = false)
 		{
@@ -368,6 +388,7 @@ namespace TwinTechs.EditorExtensions.View
 			} else {
 				SelectRowIndex (0);
 			}
+			UpdateSrollPosition ();
 		}
 
 		static string GetParameters (IUnresolvedEntity entity)

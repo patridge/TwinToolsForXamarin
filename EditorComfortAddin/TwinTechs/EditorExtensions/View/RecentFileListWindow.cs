@@ -30,6 +30,8 @@ namespace TwinTechs.EditorExtensions.View
 		Collection<FileOpenInformation> _filteredDocuments;
 		FileOpenInformation _selectedDocument;
 
+		ScrolledWindow _scrolledWindow;
+
 		Gtk.Label _pathLabel;
 
 		int _selectedIndex;
@@ -46,14 +48,17 @@ namespace TwinTechs.EditorExtensions.View
 			VBox.Add (_searchView);
 
 			CreateTree ();
-			VBox.Add (_treeView);
-
+			_scrolledWindow = new Gtk.ScrolledWindow ();
+			_scrolledWindow.SetSizeRequest (500, 600);
+			_scrolledWindow.Add (_treeView);
+			VBox.Add (_scrolledWindow);
 			_pathLabel = new Gtk.Label ();
 			_pathLabel.SetSizeRequest (500, 40);
 			VBox.Add (_pathLabel);
 
 			MemberExtensionsHelper.Instance.IsDirty = true;
 			UpdateDocuments ();
+			VBox.SetSizeRequest (500, 700);
 			this.SetSizeRequest (500, 700);
 
 			CanFocus = true;
@@ -261,6 +266,7 @@ namespace TwinTechs.EditorExtensions.View
 				}
 			};
 
+
 		}
 
 		void _treeView_Selection_Changed (object sender, EventArgs e)
@@ -272,8 +278,23 @@ namespace TwinTechs.EditorExtensions.View
 				_selectedDocument = _filteredDocuments [index];
 				_selectedIndex = index;
 			}
+			UpdateSrollPosition ();
 			_searchView.GrabFocus ();
 			_searchView.SelectRegion (_searchView.Text.Length, _searchView.Text.Length);
+		}
+
+		void UpdateSrollPosition ()
+		{
+			var rowHeight = (_scrolledWindow.Vadjustment.Upper - 22) / _filteredDocuments.Count;
+			var newOffset = _selectedIndex * rowHeight;
+			var currentLower = _scrolledWindow.Vadjustment.Value;
+			var currentUpper = _scrolledWindow.Vadjustment.Value + _scrolledWindow.Vadjustment.PageSize;
+
+			if (newOffset <= currentLower) {
+				_scrolledWindow.Vadjustment.Value = newOffset;
+			} else if (newOffset >= currentUpper - (_scrolledWindow.Vadjustment.PageSize / 2)) {
+				_scrolledWindow.Vadjustment.Value = newOffset - (_scrolledWindow.Vadjustment.PageSize / 2);
+			}
 		}
 
 		void CloseWindow (bool moveToSelectedEntry = false)
@@ -323,6 +344,7 @@ namespace TwinTechs.EditorExtensions.View
 					SelectRowIndex (0);
 				}
 			}
+			UpdateSrollPosition ();
 		}
 
 		#endregion

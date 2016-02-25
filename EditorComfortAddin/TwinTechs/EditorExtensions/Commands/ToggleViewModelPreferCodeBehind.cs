@@ -10,7 +10,7 @@ namespace TwinTechs.EditorExtensions.Commands
 	{
 		protected override void Run ()
 		{
-			MemberExtensionsHelper.Instance.ToggleVMXamlCs (true);
+			ViewModelHelper.Instance.ToggleVMXamlCs (true);
 		}
 
 		protected override void Update (CommandInfo info)

@@ -48,11 +48,7 @@ namespace TwinTechs.EditorExtensions.Model
 				Gtk.Application.Invoke (delegate {
 					IdeApp.Workbench.OpenDocument (_currentMemberReference.FileName, null, _currentMemberReference.Region.BeginLine, _currentMemberReference.Region.BeginColumn, OpenDocumentOptions.Default);
 				});
-
 			}
-
-
-
 		}
 
 
@@ -93,20 +89,28 @@ namespace TwinTechs.EditorExtensions.Model
 					List<ICompilation> list = (from c in referencingProjects.Select (FindDerivedSymbolsHelper._lookupFuncion)
 					                           where c != null
 					                           select c).ToList<ICompilation> ();
-					using (ISearchProgressMonitor monitor = IdeApp.Workbench.ProgressMonitors.GetSearchProgressMonitor (true, true)) {
-						string text = (member != null) ? GettextCatalog.GetString ("Searching for implementations...") : GettextCatalog.GetString ("Searching for implementations...");
-						monitor.BeginTask (text, list.Count);
-						Parallel.ForEach<ICompilation> (list, delegate (ICompilation comp) {
-							try {
-								FindDerivedSymbolsHelper.SearchCompilation (monitor, comp, cls, member);
-							} catch (Exception ex) {
-								LoggingService.LogInternalError (ex);
-								monitor.ReportError ("Unhandled error while searching", ex);
-							}
-							monitor.Step (1);
-						});
-						monitor.EndTask ();
-					}
+					Parallel.ForEach<ICompilation> (list, delegate (ICompilation comp) {
+						try {
+							FindDerivedSymbolsHelper.SearchCompilation (null, comp, cls, member);
+						} catch (Exception ex) {
+							LoggingService.LogInternalError (ex);
+						}
+					});
+
+//					using (ISearchProgressMonitor monitor = IdeApp.Workbench.ProgressMonitors.GetSearchProgressMonitor (true, true)) {
+//						string text = (member != null) ? GettextCatalog.GetString ("Searching for implementations...") : GettextCatalog.GetString ("Searching for implementations...");
+//						monitor.BeginTask (text, list.Count);
+//						Parallel.ForEach<ICompilation> (list, delegate (ICompilation comp) {
+//							try {
+//								FindDerivedSymbolsHelper.SearchCompilation (monitor, comp, cls, member);
+//							} catch (Exception ex) {
+//								LoggingService.LogInternalError (ex);
+//								monitor.ReportError ("Unhandled error while searching", ex);
+//							}
+//							monitor.Step (1);
+//						});
+//						monitor.EndTask ();
+//					}
 				}
 			}
 		}
@@ -139,7 +143,7 @@ namespace TwinTechs.EditorExtensions.Model
 						IdeApp.Workbench.OpenDocument (memberReference.FileName, null, memberReference.Region.BeginLine, memberReference.Region.BeginColumn, OpenDocumentOptions.Default);
 					});
 				} else {
-					//monitor.ReportResult (memberReference);
+//					monitor.ReportResult (memberReference);
 				}
 				_foundMemberReferences.Add (memberReference);
 			}

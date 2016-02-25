@@ -34,7 +34,6 @@ namespace TwinTechs.EditorExtensions.Commands
 				object item = CurrentRefactoryOperationsHandler.GetItem (activeDocument, out resolveResult);
 				var resolvedEntity = item as AbstractResolvedEntity;
 				if (resolvedEntity != null && resolvedEntity.DeclaringType.Kind == TypeKind.Interface) {
-					_mostRecentEntity = null;
 					NavigateToAbstractMember (resolvedEntity);
 				} else if (IsRequestingCycleMostRecentMemberNavigation ()) {
 					FindDerivedSymbolsHelper.CycleResults ();

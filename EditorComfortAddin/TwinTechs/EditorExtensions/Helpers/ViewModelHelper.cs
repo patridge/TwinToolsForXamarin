@@ -2,12 +2,22 @@
 using MonoDevelop.Ide;
 using MonoDevelop.Core;
 using System.IO;
+using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
+[assembly: InternalsVisibleTo ("ComfortAddInTests")]
 namespace TwinTechs.EditorExtensions.Helpers
 {
 	public class ViewModelHelper
 	{
 		string[] ViewModelPostfixes;
+		string[] AllPossiblePostfixesForFileMatching;
+		Dictionary<string,string> _statusTextsForFilePostFix = new Dictionary<string, string> {
+			[".xaml.cs" ] = "-> CB",
+			[".xaml" ] = "-> XAML",
+			["VM.cs" ] = "-> VM",
+			["ViewModel.cs" ] = "-> VM",
+		};
 
 		static ViewModelHelper _instance;
 
@@ -23,72 +33,175 @@ namespace TwinTechs.EditorExtensions.Helpers
 		public ViewModelHelper ()
 		{
 			ViewModelPostfixes = new string[]{ "VM.cs", "ViewModel.cs" };
+			AllPossiblePostfixesForFileMatching = new string[]{ ".xaml.cs", ".xaml", "VM.cs", "ViewModel.cs" };
 		}
 
+		#region methods that are virtual to facilitate unit testing
 
-		/// <summary>
-		/// Assumptions
-		/// 1. the view model is described in the classes type specifier of xaml page
-		/// 2. the viewmodel and xaml files will be in the same project
-		/// TODO filter betwee
-		/// x:TypeArguments="package.Class"
-		/// </summary>
-		public void ToggleVMXamlCs (bool preferCodeBehind = false)
-		{
-			var file = IdeApp.Workbench.ActiveDocument.FileName.FullPath.ToString ();
-			var isXamlFile = file.Contains (".xaml");
-
-			if (isXamlFile) {
-				if (file.EndsWith (".xaml.cs")) {
-					file = file.Replace (".xaml.cs", ".xaml");
-				}
-				OpenVMDocument (file);
-				StatusHelper.ShowStatus (MonoDevelop.Ide.Gui.Stock.OpenFileIcon, "-> VM:" + file);
-			} else {
-
-				OpenXamlDocument (file, preferCodeBehind);
+		internal virtual string CurrentFileName {
+			get {
+				return IdeApp.Workbench.ActiveDocument.FileName.FullPath.ToString ();
 			}
 		}
 
-		/// <summary>
-		/// Opens the xaml document.
-		/// </summary>
-		/// <param name="fileName">File name.</param>
-		/// <param name="gotoCodeBehind">If set to <c>true</c> goto code behind.</param>
+		internal virtual bool GetFileExists (string filename)
+		{
+			return File.Exists (filename);
+		}
+
+		#endregion
+
+		public bool IsTogglingPossibleForActiveDocument {
+			get {
+				return VMFileNameForActiveDocument != null &&
+				GetFileExists (XamlFileNameForActiveDocument) &&
+				GetFileExists (CodeBehindFileNameForActiveDocument);
+			}
+		}
+
+		public bool IsActiveFileAViewFile {
+			get {
+				return IsActiveFileCodeBehindFile || IsActiveFileXamlFile || IsActiveFileViewModel;
+			}
+		}
+
+		public bool IsActiveFileXamlFile {
+			get {
+				return CurrentFileName.EndsWith (".xaml");
+			}
+		}
+
+		public bool IsActiveFileCodeBehindFile {
+			get {
+				return CurrentFileName.EndsWith (".xaml.cs");
+			}
+		}
+
+		public bool IsActiveFileViewModel {
+			get {
+				var file = CurrentFileName;
+				foreach (var viewModelPostFix in ViewModelPostfixes) {
+					if (file.EndsWith (viewModelPostFix)) {
+						return true;
+					}
+				}
+				return false;
+			}
+		}
+
+		public string RootFileNameForActiveDocument {
+			get {
+				var file = CurrentFileName;
+				foreach (var viewModelPostFix in AllPossiblePostfixesForFileMatching) {
+					if (file.EndsWith (viewModelPostFix)) {
+						return file.Replace (viewModelPostFix, "");
+					}
+				}
+				return null;
+			}
+		}
+
+		public string XamlFileNameForActiveDocument {
+			get {
+				var filename = RootFileNameForActiveDocument;
+				if (filename != null) {
+					return filename + ".xaml";
+				} else {
+					return null;
+				}
+			}
+		}
+
+		public string VMFileNameForActiveDocument {
+			get {
+				var filename = RootFileNameForActiveDocument;
+				if (filename != null) {
+					foreach (var viewModelPostFix in ViewModelPostfixes) {
+						var targetFileName = filename + viewModelPostFix;
+						if (GetFileExists (targetFileName)) {
+							return targetFileName;
+						}
+					}
+				}
+				return null;
+			}
+		}
+
+		public string CodeBehindFileNameForActiveDocument {
+			get {
+				var filename = RootFileNameForActiveDocument;
+				if (filename != null) {
+					return filename + ".xaml.cs";
+				} else {
+					return null;
+				}
+				
+			}
+		}
+
+
+		public void ToggleVMAndXaml ()
+		{
+			string filename = IsActiveFileXamlFile ? VMFileNameForActiveDocument : XamlFileNameForActiveDocument;
+			OpenDocument (filename);
+		}
+
+		public void ToggleVMAndCodeBehind ()
+		{
+			string filename = IsActiveFileCodeBehindFile ? VMFileNameForActiveDocument : CodeBehindFileNameForActiveDocument;
+			OpenDocument (filename);
+		}
+
+		public void CycleXamlCodeBehindViewModel ()
+		{
+
+			string filename = null;
+			if (IsActiveFileXamlFile) {
+				filename = CodeBehindFileNameForActiveDocument;
+			} else if (IsActiveFileCodeBehindFile) {
+				filename = VMFileNameForActiveDocument;
+			} else {
+				filename = XamlFileNameForActiveDocument;
+			}
+			OpenDocument (filename);
+		}
+
+
+
 		public void OpenXamlDocument (string fileName, bool gotoCodeBehind = false)
 		{
-
-			//jump back to xaml file - do this based on the class containing vm or viewmodel extension
-
-			foreach (var viewModelPostFix in ViewModelPostfixes) {
-				if (fileName.Contains (viewModelPostFix)) {
-					var fileExtension = gotoCodeBehind ? ".xaml.cs" : ".xaml";
-					var targetFileName = fileName.Replace (viewModelPostFix, fileExtension);
-					//for now assume in the same folder
-					var filePath = new FilePath (targetFileName);
-					IdeHelper.OpenDocument (filePath);
-					StatusHelper.ShowStatus (MonoDevelop.Ide.Gui.Stock.OpenFileIcon, (gotoCodeBehind ? "-> CB :" : "-> XAML :") + fileName);
-					break;
-				}
-			}
 		}
 
-		/// <summary>
-		/// Opens the VM document.
-		/// </summary>
-		/// <param name="fileName">File name.</param>
-		public void OpenVMDocument (string fileName)
+		public void OpenVMDocument ()
 		{
-			foreach (var viewModelPostFix in new string[]{"VM.cs","ViewModel.cs"}) {
-				var targetFileName = fileName.Replace (".xaml", viewModelPostFix);
-				if (File.Exists (targetFileName)) {
-					var filePath = new FilePath (targetFileName);
-					//for now assume in the same folder
-					IdeHelper.OpenDocument (filePath);
-					break;
-				}
+		}
+
+
+		#region private impl
+
+		internal virtual void OpenDocument (string filename)
+		{
+			if (!string.IsNullOrEmpty (filename)) {
+				var filePath = new FilePath (filename);
+				IdeHelper.OpenDocument (filePath);
+				StatusHelper.ShowStatus (MonoDevelop.Ide.Gui.Stock.OpenFileIcon, GetStatusPrefix (filename) + ": " + filename);
+			} else {
+				StatusHelper.ShowStatus (MonoDevelop.Ide.Gui.Stock.StatusError, "Could not find associated file");
 			}
 		}
+
+		internal string GetStatusPrefix (string filename)
+		{
+			foreach (var key in _statusTextsForFilePostFix.Keys) {
+				if (filename.EndsWith (key)) {
+					return _statusTextsForFilePostFix [key];
+				}
+			}
+			return null;
+
+		}
+
+		#endregion
 
 
 	}

@@ -6,11 +6,11 @@ using TwinTechs.EditorExtensions.Helpers;
 namespace TwinTechs.EditorExtensions.Commands
 {
 
-	public class ToggleViewModel : CommandHandler
+	public class CycleViewModelXamlCodeBehind : CommandHandler
 	{
 		protected override void Run ()
 		{
-			ViewModelHelper.Instance.ToggleVMAndXaml ();
+			ViewModelHelper.Instance.CycleXamlCodeBehindViewModel ();
 		}
 
 		protected override void Update (CommandInfo info)

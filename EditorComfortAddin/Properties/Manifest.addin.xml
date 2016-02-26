@@ -39,6 +39,13 @@
 			macShortcut="Ctrl|Down"
 			defaultHandler="TwinTechs.EditorExtensions.Commands.NextMember" />
 
+		<Command id="TwinTechs.EditorExtensions.Commands.CycleViewModelXamlCodeBehind"
+			_label="Cycle VM/Xaml/Code behind"
+			_description="Cycles between the vm and xaml file and code behind files"
+			shortcut="Shift|Meta|F8"
+			macShortcut="Shift|Meta|F8"
+			defaultHandler="TwinTechs.EditorExtensions.Commands.CycleViewModelXamlCodeBehind" />
+
 		<Command id="TwinTechs.EditorExtensions.Commands.ToggleViewModel"
 			_label="Cycle VM/Xaml"
 			_description="Cycles between the vm and xaml file"
@@ -46,12 +53,12 @@
 			macShortcut="Shift|Meta|F9"
 			defaultHandler="TwinTechs.EditorExtensions.Commands.ToggleViewModel" />
 
-		<Command id="TwinTechs.EditorExtensions.Commands.ToggleViewModelPreferCodeBehind"
-			_label="Cycle VM/code behind"
-			_description="Will cycle through the vm and code behind file"
+		<Command id="TwinTechs.EditorExtensions.Commands.ToggleVMAndCodeBehind"
+			_label="Cycle VM/Code-behind"
+			_description="Will cycle through the VM and code-behind file"
 			shortcut="Shift|Meta|F10"
 			macShortcut="Shift|Meta|F10"
-			defaultHandler="TwinTechs.EditorExtensions.Commands.ToggleViewModelPreferCodeBehind" />
+			defaultHandler="TwinTechs.EditorExtensions.Commands.ToggleVMAndCodeBehind" />
 	</Extension>
 
 	<Extension path="/MonoDevelop/Ide/MainMenu/Search">
@@ -72,8 +79,10 @@
 
 		<SeparatorItem id="TwinAddinsSeparator3" />
 
+		<CommandItem id="TwinTechs.EditorExtensions.Commands.CycleViewModelXamlCodeBehind" />
+
 		<CommandItem id="TwinTechs.EditorExtensions.Commands.ToggleViewModel" />
 
-		<CommandItem id="TwinTechs.EditorExtensions.Commands.ToggleViewModelPreferCodeBehind" />
+		<CommandItem id="TwinTechs.EditorExtensions.Commands.ToggleVMAndCodeBehind" />
 	</Extension>
 </ExtensionModel>

@@ -6,16 +6,18 @@ using TwinTechs.EditorExtensions.Helpers;
 namespace TwinTechs.EditorExtensions.Commands
 {
 
-	public class ToggleViewModelPreferCodeBehind : CommandHandler
+	public class ToggleVMAndCodeBehind : CommandHandler
 	{
 		protected override void Run ()
 		{
-			ViewModelHelper.Instance.ToggleVMXamlCs (true);
+			ViewModelHelper.Instance.ToggleVMAndCodeBehind ();
 		}
 
 		protected override void Update (CommandInfo info)
 		{
 			var isEnabled = IdeApp.Workspace.GetIsWorkspaceOpen () && IdeApp.Workspace.GetIsDocumentOpen ();
+			isEnabled &= ViewModelHelper.Instance.IsTogglingPossibleForActiveDocument;
+			isEnabled &= ViewModelHelper.Instance.IsActiveFileAViewFile;
 
 			//TODO check if document is xaml/codebehind/vm
 			info.Enabled = isEnabled;

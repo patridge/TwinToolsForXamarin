@@ -320,7 +320,8 @@ namespace TwinTechs.EditorExtensions.View
 
 		void UpdateSrollPosition ()
 		{
-			var rowHeight = (_scrolledWindow.Vadjustment.Upper - 22) / _filteredEntities.Count;
+			//TODO - get rowheight from treeview.. somehow
+			var rowHeight = 22;
 			var newOffset = _selectedIndex * rowHeight;
 			var currentLower = _scrolledWindow.Vadjustment.Value;
 			var currentUpper = _scrolledWindow.Vadjustment.Value + _scrolledWindow.Vadjustment.PageSize;

@@ -285,7 +285,7 @@ namespace TwinTechs.EditorExtensions.View
 
 		void UpdateSrollPosition ()
 		{
-			var rowHeight = (_scrolledWindow.Vadjustment.Upper - 22) / _filteredDocuments.Count;
+			var rowHeight = 22;
 			var newOffset = _selectedIndex * rowHeight;
 			var currentLower = _scrolledWindow.Vadjustment.Value;
 			var currentUpper = _scrolledWindow.Vadjustment.Value + _scrolledWindow.Vadjustment.PageSize;

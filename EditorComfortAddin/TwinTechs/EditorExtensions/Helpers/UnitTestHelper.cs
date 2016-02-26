@@ -7,15 +7,12 @@ using System.Runtime.CompilerServices;
 
 namespace TwinTechs.EditorExtensions.Helpers
 {
-	public class ViewModelHelper
+	public class UnitTestHelper
 	{
-		string[] ViewModelPostfixes;
 		string[] AllPossiblePostfixesForFileMatching;
 		Dictionary<string,string> _statusTextsForFilePostFix = new Dictionary<string, string> {
-			[".xaml.cs" ] = "-> CB",
-			[".xaml" ] = "-> XAML",
-			["VM.cs" ] = "-> VM",
-			["ViewModel.cs" ] = "-> VM",
+			["Tests.cs" ] = "-> TEST",
+			[".cs" ] = "-> IMPL",
 		};
 
 		static ViewModelHelper _instance;
@@ -29,10 +26,9 @@ namespace TwinTechs.EditorExtensions.Helpers
 			}
 		}
 
-		public ViewModelHelper ()
+		public UnitTestHelper ()
 		{
-			ViewModelPostfixes = new string[]{ "VM.cs", "ViewModel.cs" };
-			AllPossiblePostfixesForFileMatching = new string[]{ ".xaml.cs", ".xaml", "VM.cs", "ViewModel.cs" };
+			AllPossiblePostfixesForFileMatching = new string[]{ "Tests.cs", ".cs" };
 		}
 
 		#region methods that are virtual to facilitate unit testing
@@ -53,38 +49,20 @@ namespace TwinTechs.EditorExtensions.Helpers
 		public bool IsTogglingPossibleForActiveDocument {
 			get {
 				return VMFileNameForActiveDocument != null &&
-				GetFileExists (XamlFileNameForActiveDocument) &&
-				GetFileExists (CodeBehindFileNameForActiveDocument);
+				GetFileExists (TestsFileNameForActiveDocument) &&
+				GetFileExists (ImplementationFileNameForActiveDocument);
 			}
 		}
 
-		public bool IsActiveFileAViewFile {
+		public bool IsActiveFileUnitTestFile {
 			get {
-				return IsActiveFileCodeBehindFile || IsActiveFileXamlFile || IsActiveFileViewModel;
+				return CurrentFileName.EndsWith ("Tests.cs");
 			}
 		}
 
-		public bool IsActiveFileXamlFile {
+		public bool IsActiveFileImplementationFIle {
 			get {
-				return CurrentFileName.EndsWith (".xaml");
-			}
-		}
-
-		public bool IsActiveFileCodeBehindFile {
-			get {
-				return CurrentFileName.EndsWith (".xaml.cs");
-			}
-		}
-
-		public bool IsActiveFileViewModel {
-			get {
-				var file = CurrentFileName;
-				foreach (var viewModelPostFix in ViewModelPostfixes) {
-					if (file.EndsWith (viewModelPostFix)) {
-						return true;
-					}
-				}
-				return false;
+				return CurrentFileName.EndsWith (".cs");
 			}
 		}
 
@@ -100,37 +78,22 @@ namespace TwinTechs.EditorExtensions.Helpers
 			}
 		}
 
-		public string XamlFileNameForActiveDocument {
+		public string TestsFileNameForActiveDocument {
 			get {
 				var filename = RootFileNameForActiveDocument;
 				if (filename != null) {
-					return filename + ".xaml";
+					return filename + "Tests.cs";
 				} else {
 					return null;
 				}
 			}
 		}
 
-		public string VMFileNameForActiveDocument {
+		public string ImplementationFileNameForActiveDocument {
 			get {
 				var filename = RootFileNameForActiveDocument;
 				if (filename != null) {
-					foreach (var viewModelPostFix in ViewModelPostfixes) {
-						var targetFileName = filename + viewModelPostFix;
-						if (GetFileExists (targetFileName)) {
-							return targetFileName;
-						}
-					}
-				}
-				return null;
-			}
-		}
-
-		public string CodeBehindFileNameForActiveDocument {
-			get {
-				var filename = RootFileNameForActiveDocument;
-				if (filename != null) {
-					return filename + ".xaml.cs";
+					return filename + ".cs";
 				} else {
 					return null;
 				}
@@ -141,27 +104,13 @@ namespace TwinTechs.EditorExtensions.Helpers
 
 		public void ToggleVMAndXaml ()
 		{
-			string filename = IsActiveFileXamlFile ? VMFileNameForActiveDocument : XamlFileNameForActiveDocument;
+			string filename = IsActiveFileUnitTestFile ? VMFileNameForActiveDocument : TestsFileNameForActiveDocument;
 			OpenDocument (filename);
 		}
 
 		public void ToggleVMAndCodeBehind ()
 		{
-			string filename = IsActiveFileCodeBehindFile ? VMFileNameForActiveDocument : CodeBehindFileNameForActiveDocument;
-			OpenDocument (filename);
-		}
-
-		public void CycleXamlCodeBehindViewModel ()
-		{
-
-			string filename = null;
-			if (IsActiveFileXamlFile) {
-				filename = CodeBehindFileNameForActiveDocument;
-			} else if (IsActiveFileCodeBehindFile) {
-				filename = VMFileNameForActiveDocument;
-			} else {
-				filename = XamlFileNameForActiveDocument;
-			}
+			string filename = IsActiveFileImplementationFIle ? VMFileNameForActiveDocument : ImplementationFileNameForActiveDocument;
 			OpenDocument (filename);
 		}
 

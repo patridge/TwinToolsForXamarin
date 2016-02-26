@@ -11,12 +11,12 @@
 			macShortcut="Meta|E"
 			defaultHandler="TwinTechs.EditorExtensions.Commands.ShowRecentDocumentBrowser" />
 
-		<Command id="TwinTechs.EditorExtensions.Commands.GotoMemberImplementation"
+		<Command id="TwinTechs.EditorExtensions.Commands.GoToDeclarationPlus"
 			_label="Go to Declaration+"
 			_description="Advanced version of go to declaration. Can go direct to implementing classes, and some Xaml types."
 			shortcut="Meta|b"
 			macShortcut="Meta|b"
-			defaultHandler="TwinTechs.EditorExtensions.Commands.GotoMemberImplementation" />
+			defaultHandler="TwinTechs.EditorExtensions.Commands.GoToDeclarationPlus" />
 
 		<Command id="TwinTechs.EditorExtensions.Commands.ShowMembers"
 			_label="Show Members"
@@ -65,7 +65,7 @@
 
 		<SeparatorItem id="TwinAddinsSeparator1" />
 
-		<CommandItem id="TwinTechs.EditorExtensions.Commands.GotoMemberImplementation" />
+		<CommandItem id="TwinTechs.EditorExtensions.Commands.GoToDeclarationPlus" />
 
 		<CommandItem id="TwinTechs.EditorExtensions.Commands.BrowseRecentDocument" />
 

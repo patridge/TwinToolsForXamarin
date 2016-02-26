@@ -5,7 +5,6 @@ using System.IO;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
-[assembly: InternalsVisibleTo ("ComfortAddInTests")]
 namespace TwinTechs.EditorExtensions.Helpers
 {
 	public class ViewModelHelper
@@ -198,7 +197,6 @@ namespace TwinTechs.EditorExtensions.Helpers
 				}
 			}
 			return null;
-
 		}
 
 		#endregion

@@ -37,6 +37,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="TwinTechs\EditorExtensions\Helpers\ViewModelHelperTests.cs" />
+    <Compile Include="TwinTechs\EditorExtensions\Helpers\XamlHelperTests.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -44,6 +45,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="TwinTechs\" />
+    <Folder Include="TwinTechs\EditorExtensions\Commands\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\EditorComfortAddin\EditorComfortAddin.csproj">

@@ -8,6 +8,8 @@ namespace TwinTechs.EditorExtensions.Helpers
 	{
 		static System.Timers.Timer _timer;
 
+		//TODO - add handlers to track when a document window is closed, and reset the status
+
 
 		/// <summary>
 		/// Shows the status.

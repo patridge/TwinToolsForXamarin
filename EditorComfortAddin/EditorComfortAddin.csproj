@@ -54,7 +54,6 @@
     <Compile Include="TwinTechs\EditorExtensions\View\MemberListWindow.cs" />
     <Compile Include="TwinTechs\EditorExtensions\View\MemberMatchingHelper.cs" />
     <Compile Include="TwinTechs\EditorExtensions\View\RecentFileListWindow.cs" />
-    <Compile Include="TwinTechs\EditorExtensions\Commands\GotoMemberImplementation.cs" />
     <Compile Include="TwinTechs\EditorExtensions\Helpers\RootWorkspaceExtensions.cs" />
     <Compile Include="TwinTechs\EditorExtensions\Extensions\IEnumerableExtensions.cs" />
     <Compile Include="TwinTechs\EditorExtensions\Helpers\NavigationHelper.cs" />
@@ -64,6 +63,9 @@
     <Compile Include="TwinTechs\EditorExtensions\Helpers\ViewModelHelper.cs" />
     <Compile Include="TwinTechs\EditorExtensions\Commands\CycleViewModelXamlCodeBehind.cs" />
     <Compile Include="TwinTechs\EditorExtensions\Commands\ToggleVMAndCodeBehind.cs" />
+    <Compile Include="TwinTechs\EditorExtensions\Commands\GoToDeclarationPlus.cs" />
+    <Compile Include="TwinTechs\EditorExtensions\Extensions\StringExtensions.cs" />
+    <Compile Include="TwinTechs\EditorExtensions\Helpers\XamlHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Manifest.addin.xml" />

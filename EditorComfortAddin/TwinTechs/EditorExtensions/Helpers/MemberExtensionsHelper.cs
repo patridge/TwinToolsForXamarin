@@ -62,6 +62,7 @@ namespace TwinTechs.EditorExtensions.Helpers
 
 			if (IsDirty || _cachedEntities == null) {
 				IdeApp.Workbench.ActiveDocument.UpdateParseDocument ();
+				parsedDoc = IdeApp.Workbench.ActiveDocument.ParsedDocument;
 				_cachedEntities = new Collection<IUnresolvedEntity> ();
 				foreach (var typeDef in parsedDoc.TopLevelTypeDefinitions) {
 					//TODO pretty print these
@@ -90,6 +91,19 @@ namespace TwinTechs.EditorExtensions.Helpers
 				var region = memberType.Region;
 				editor.SetCaretTo (region.BeginLine, region.BeginColumn, true, false);
 				editor.CenterToCaret ();
+			}
+		}
+
+		public void GotoMemberWithName (string memberName)
+		{
+			var editor = IdeApp.Workbench.ActiveDocument.Editor;
+			var entities = GetEntities ();
+			foreach (var entity in entities) {
+				if (entity.Name.EndsWith (memberName)) {
+					var region = entity.Region;
+					editor.SetCaretTo (region.BeginLine, region.BeginColumn, true, false);
+					editor.CenterToCaret ();	
+				}
 			}
 		}
 

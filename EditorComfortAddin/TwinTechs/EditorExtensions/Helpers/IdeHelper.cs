@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using MonoDevelop.Ide;
 using MonoDevelop.Ide.Gui;
+using MonoDevelop.Projects;
 
 namespace TwinTechs.EditorExtensions.Helpers
 {
@@ -8,13 +9,14 @@ namespace TwinTechs.EditorExtensions.Helpers
 	{
 
 		/// <summary>
-		/// Encapsulated as I might need to do some more clever stuff here later for caching/reuse; but for now it 
-		/// seems that Xamarin handles all the cases I need.
+		/// Opens the document.
 		/// </summary>
 		/// <param name="fileName">File name.</param>
-		public static void OpenDocument (string fileName)
+		/// <param name="project">Project.</param>
+		public static void OpenDocument (string fileName, Project project = null)
 		{
-			IdeApp.Workbench.OpenDocument (fileName, IdeApp.Workbench.ActiveDocument.Project, OpenDocumentOptions.TryToReuseViewer | OpenDocumentOptions.BringToFront);
+			var projectToUse = project ?? IdeApp.Workbench.ActiveDocument.Project;
+			IdeApp.Workbench.OpenDocument (fileName, projectToUse, OpenDocumentOptions.TryToReuseViewer | OpenDocumentOptions.BringToFront);
 		}
 
 

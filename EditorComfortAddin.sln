@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EditorComfortAddin", "EditorComfortAddin\EditorComfortAddin.csproj", "{EB1A8C73-75D5-442D-8382-4676F0A82BE5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ComfortAddInTests", "ComfortAddInTests\ComfortAddInTests.csproj", "{26499401-54C6-47C1-BB9E-A8C438B05E80}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EditorComfortAddinTests", "ComfortAddInTests\EditorComfortAddinTests.csproj", "{26499401-54C6-47C1-BB9E-A8C438B05E80}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

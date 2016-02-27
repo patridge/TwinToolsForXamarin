@@ -59,6 +59,13 @@
 			shortcut="Shift|Meta|F10"
 			macShortcut="Shift|Meta|F10"
 			defaultHandler="TwinTechs.EditorExtensions.Commands.ToggleVMAndCodeBehind" />
+
+		<Command id="TwinTechs.EditorExtensions.Commands.ToggleUnitTestAndImplementation"
+			_label="Toggle Unit Tests"
+			_description="Will toggle the Unit test and implementation file"
+			shortcut="Alt|Meta|t"
+			macShortcut="Alt|Meta|t"
+			defaultHandler="TwinTechs.EditorExtensions.Commands.ToggleUnitTestAndImplementation" />
 	</Extension>
 
 	<Extension path="/MonoDevelop/Ide/MainMenu/Search">
@@ -84,5 +91,9 @@
 		<CommandItem id="TwinTechs.EditorExtensions.Commands.ToggleViewModel" />
 
 		<CommandItem id="TwinTechs.EditorExtensions.Commands.ToggleVMAndCodeBehind" />
+
+		<SeparatorItem id="TwinAddinsSeparator3" />
+
+		<CommandItem id="TwinTechs.EditorExtensions.Commands.ToggleUnitTestAndImplementation" />
 	</Extension>
 </ExtensionModel>

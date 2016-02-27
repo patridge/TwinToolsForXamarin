@@ -38,6 +38,7 @@
   <ItemGroup>
     <Compile Include="TwinTechs\EditorExtensions\Helpers\ViewModelHelperTests.cs" />
     <Compile Include="TwinTechs\EditorExtensions\Helpers\XamlHelperTests.cs" />
+    <Compile Include="TwinTechs\EditorExtensions\Helpers\UnitTestHelperTests.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

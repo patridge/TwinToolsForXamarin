@@ -4,6 +4,7 @@ using MonoDevelop.Core;
 using System.IO;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using TwinTechs.EditorExtensions.Extensions;
 
 namespace TwinTechs.EditorExtensions.Helpers
 {
@@ -103,11 +104,15 @@ namespace TwinTechs.EditorExtensions.Helpers
 		public string XamlFileNameForActiveDocument {
 			get {
 				var filename = RootFileNameForActiveDocument;
-				if (filename != null) {
-					return filename + ".xaml";
-				} else {
-					return null;
+
+				var possiblefileNames = GetPossibleFilenames (filename);
+				foreach (var possibleFilename in possiblefileNames) {
+					var targetFileName = possibleFilename + ".xaml";
+					if (GetFileExists (targetFileName)) {
+						return targetFileName;
+					}
 				}
+				return null;
 			}
 		}
 
@@ -115,15 +120,44 @@ namespace TwinTechs.EditorExtensions.Helpers
 			get {
 				var filename = RootFileNameForActiveDocument;
 				if (filename != null) {
-					foreach (var viewModelSuffix in ViewModelSuffixes) {
-						var targetFileName = filename + viewModelSuffix;
-						if (GetFileExists (targetFileName)) {
-							return targetFileName;
+					//it's possible that the filename is also in another place
+					var possiblefileNames = GetPossibleFilenames (filename);
+					foreach (var possibleFilename in possiblefileNames) {
+						foreach (var viewModelSuffix in ViewModelSuffixes) {
+							var targetFileName = possibleFilename + viewModelSuffix;
+							if (GetFileExists (targetFileName)) {
+								return targetFileName;
+							}
 						}
 					}
 				}
 				return null;
 			}
+		}
+
+		/// <summary>
+		/// Gets the possible folders, becuase we might have the viewmodels in the same folder, or
+		/// in a viewmodel folder.
+		/// </summary>
+		/// <returns>The possible folders.</returns>
+		/// <param name="folder">Folder.</param>
+		public List<string> GetPossibleFilenames (string filename)
+		{
+			var folders = new List<string> ();
+			if (filename != null) {
+				
+				folders.Add (filename);
+				var pathName = System.IO.Path.GetDirectoryName (filename);
+				var fileName = System.IO.Path.GetFileNameWithoutExtension (filename);
+				if (pathName.EndsWith ("/View")) {
+					var viewModelFolder = pathName.ReplaceLastOccurrence ("/View", "/ViewModel/");
+					folders.Add (viewModelFolder + fileName);
+				} else if (pathName.EndsWith ("/ViewModel")) {
+					var viewModelFolder = pathName.ReplaceLastOccurrence ("/ViewModel", "/View/");
+					folders.Add (viewModelFolder + fileName);
+				}
+			}
+			return folders;
 		}
 
 		public string CodeBehindFileNameForActiveDocument {
@@ -137,7 +171,6 @@ namespace TwinTechs.EditorExtensions.Helpers
 				
 			}
 		}
-
 
 		public void ToggleVMAndXaml ()
 		{

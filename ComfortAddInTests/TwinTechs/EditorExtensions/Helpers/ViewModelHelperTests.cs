@@ -7,7 +7,7 @@ namespace TwinTechs.EditorExtensions.Helpers
 	{
 		public string ReturnFileName { get; set; }
 
-		public int NumberOfGetFileCallsToInvokeBeforeReturningTrue { get; set; }
+		public int? NumberOfGetFileCallsToInvokeBeforeReturningTrue { get; set; }
 
 		internal override string CurrentFileName { get { return ReturnFileName; } }
 
@@ -15,10 +15,18 @@ namespace TwinTechs.EditorExtensions.Helpers
 
 		public string FilenamePassedToOpenDocumentMethod { get; private set; }
 
+		public string[] FilesThatWillNotExist { get; set; }
+
 		internal override bool GetFileExists (string filename)
 		{
 			NumberOfTimeGetFileExistsInvoked++;
-			return NumberOfTimeGetFileExistsInvoked == NumberOfGetFileCallsToInvokeBeforeReturningTrue;
+			if (FilesThatWillNotExist != null && Array.IndexOf (FilesThatWillNotExist, filename) != -1) {
+				return false;
+			} else if (NumberOfGetFileCallsToInvokeBeforeReturningTrue == null) {
+				return true;
+			} else {
+				return NumberOfTimeGetFileExistsInvoked == NumberOfGetFileCallsToInvokeBeforeReturningTrue;
+			}
 		}
 
 		internal override void OpenDocument (string filename)
@@ -109,6 +117,7 @@ namespace TwinTechs.EditorExtensions.Helpers
 		public string TestXamlFileNameForActiveDocument (string fileName)
 		{
 			_helper.ReturnFileName = fileName;
+			_helper.NumberOfGetFileCallsToInvokeBeforeReturningTrue = null;
 			return _helper.XamlFileNameForActiveDocument;
 		}
 
@@ -158,16 +167,34 @@ namespace TwinTechs.EditorExtensions.Helpers
 			return _helper.GetStatusPrefix (fileName);
 		}
 
-		[TestCase ("test/pkg2/pkg3/test3.xaml", 2, ExpectedResult = "test/pkg2/pkg3/test3ViewModel.cs")]
-		[TestCase ("test/pkg2/pkg3/test3.xaml.cs", 2, ExpectedResult = "test/pkg2/pkg3/test3.xaml")]
-		[TestCase ("test/pkg2/pkg3/test3.cs", 2, ExpectedResult = null)]
-		[TestCase ("test/pkg2/pkg3/test3VM.cs", 2, ExpectedResult = "test/pkg2/pkg3/test3.xaml")]
-		[TestCase ("test/pkg2/pkg3/test3ViewModel.cs", 2, ExpectedResult = "test/pkg2/pkg3/test3.xaml")]
+		[TestCase ("test/pkg2/pkg3/test3.xaml", new string[]{ "test/pkg2/pkg3/test3VM.cs" }, ExpectedResult = "test/pkg2/pkg3/test3ViewModel.cs")]
+		[TestCase ("test/pkg2/pkg3/test3.xaml.cs", null, ExpectedResult = "test/pkg2/pkg3/test3.xaml")]
+		[TestCase ("test/pkg2/pkg3/test3.cs", null, ExpectedResult = null)]
+		[TestCase ("test/pkg2/pkg3/test3VM.cs", null, ExpectedResult = "test/pkg2/pkg3/test3.xaml")]
+		[TestCase ("test/pkg2/pkg3/test3ViewModel.cs", null, ExpectedResult = "test/pkg2/pkg3/test3.xaml")]
 
-		public string TestToggleVMAndXaml (string fileName, int numberOfTimesToInvokeFileExists)
+		[TestCase ("test/pkg2/pkg3/View/test3.xaml", new string[] {
+			"test/pkg2/pkg3/View/test3VM.cs",
+			"test/pkg2/pkg3/ViewModel/test3VM.cs",
+			"test/pkg2/pkg3/View/test3ViewModel.cs"
+		}, ExpectedResult = "test/pkg2/pkg3/ViewModel/test3ViewModel.cs")]
+		[TestCase ("test/pkg2/pkg3/View/test3.xaml.cs", null, ExpectedResult = "test/pkg2/pkg3/View/test3.xaml")]
+		[TestCase ("test/pkg2/pkg3/View/test3.cs", null, ExpectedResult = null)]
+		[TestCase ("test/pkg2/pkg3/ViewModel/test3VM.cs", new string[] {
+			"test/pkg2/pkg3/ViewModel/test3.xaml",
+		}, ExpectedResult = "test/pkg2/pkg3/View/test3.xaml")]
+		[TestCase ("test/pkg2/pkg3/ViewModel/test3ViewModel.cs", new string[] {
+			"test/pkg2/pkg3/ViewModel/test3.xaml",
+		}, ExpectedResult = "test/pkg2/pkg3/View/test3.xaml")]
+
+
+		public string TestToggleVMAndXaml (string fileName, string[] filesForcedToNotExist)
 		{
 			_helper.ReturnFileName = fileName;
-			_helper.NumberOfGetFileCallsToInvokeBeforeReturningTrue = numberOfTimesToInvokeFileExists;
+			_helper.NumberOfGetFileCallsToInvokeBeforeReturningTrue = null;
+			if (filesForcedToNotExist != null) {
+				_helper.FilesThatWillNotExist = filesForcedToNotExist;
+			}
 			_helper.ToggleVMAndXaml ();
 			return _helper.FilenamePassedToOpenDocumentMethod;
 		}
@@ -191,40 +218,80 @@ namespace TwinTechs.EditorExtensions.Helpers
 		public void CycleXamlCodeBehindViewModel ()
 		{
 			_helper.ReturnFileName = "test3.xaml";
-			_helper.NumberOfGetFileCallsToInvokeBeforeReturningTrue = 2;
-
+			_helper.NumberOfGetFileCallsToInvokeBeforeReturningTrue = null;
 			_helper.CycleXamlCodeBehindViewModel ();
 			Assert.That (_helper.FilenamePassedToOpenDocumentMethod, Is.EqualTo ("test3.xaml.cs"));
+
 			_helper.ReturnFileName = _helper.FilenamePassedToOpenDocumentMethod;
 			_helper.NumberOfTimeGetFileExistsInvoked = 0;
-
+			_helper.FilesThatWillNotExist = new string[]{ "test3VM.cs" };
 			_helper.CycleXamlCodeBehindViewModel ();
 			Assert.That (_helper.FilenamePassedToOpenDocumentMethod, Is.EqualTo ("test3ViewModel.cs"));
+
 			_helper.ReturnFileName = _helper.FilenamePassedToOpenDocumentMethod;
 			_helper.NumberOfTimeGetFileExistsInvoked = 0;
-
 			_helper.CycleXamlCodeBehindViewModel ();
 			Assert.That (_helper.FilenamePassedToOpenDocumentMethod, Is.EqualTo ("test3.xaml"));
+
 			_helper.ReturnFileName = _helper.FilenamePassedToOpenDocumentMethod;
 			_helper.NumberOfTimeGetFileExistsInvoked = 0;
-
-
 			_helper.NumberOfGetFileCallsToInvokeBeforeReturningTrue = 1;
-
 			_helper.CycleXamlCodeBehindViewModel ();
 			Assert.That (_helper.FilenamePassedToOpenDocumentMethod, Is.EqualTo ("test3.xaml.cs"));
+
 			_helper.ReturnFileName = _helper.FilenamePassedToOpenDocumentMethod;
 			_helper.NumberOfTimeGetFileExistsInvoked = 0;
-
+			_helper.FilesThatWillNotExist = new string[]{ "test3ViewModel.cs" };
 			_helper.CycleXamlCodeBehindViewModel ();
 			Assert.That (_helper.FilenamePassedToOpenDocumentMethod, Is.EqualTo ("test3VM.cs"));
+
 			_helper.ReturnFileName = _helper.FilenamePassedToOpenDocumentMethod;
 			_helper.NumberOfTimeGetFileExistsInvoked = 0;
-
 			_helper.CycleXamlCodeBehindViewModel ();
 			Assert.That (_helper.FilenamePassedToOpenDocumentMethod, Is.EqualTo ("test3.xaml"));
 			_helper.ReturnFileName = _helper.FilenamePassedToOpenDocumentMethod;
 			_helper.NumberOfTimeGetFileExistsInvoked = 0;
+
+		}
+
+		[Test]
+		public void GetPossibleFilenames ()
+		{
+			//xaml
+			_helper.ReturnFileName = "test/pkg2/pkg3/test3.xaml";
+			_helper.NumberOfGetFileCallsToInvokeBeforeReturningTrue = 1;
+			var possibleFiles = _helper.GetPossibleFilenames ("test/pkg2/pkg3/test3");
+			Assert.That (possibleFiles.Count, Is.EqualTo (1));
+
+			_helper.ReturnFileName = "test/pkg2/pkg3/View/test3.xaml";
+			_helper.NumberOfGetFileCallsToInvokeBeforeReturningTrue = 1;
+			possibleFiles = _helper.GetPossibleFilenames ("test/pkg2/pkg3/View/test3");
+			Assert.That (possibleFiles.Count, Is.EqualTo (2));
+
+			//vm
+			_helper.ReturnFileName = "test/pkg2/pkg3/test3VM.cs";
+			_helper.NumberOfGetFileCallsToInvokeBeforeReturningTrue = 1;
+			possibleFiles = _helper.GetPossibleFilenames ("test/pkg2/pkg3/test3VM");
+			Assert.That (possibleFiles.Count, Is.EqualTo (1));
+
+
+			_helper.ReturnFileName = "test/pkg2/pkg3/ViewModel/test3VM.cs";
+			_helper.NumberOfGetFileCallsToInvokeBeforeReturningTrue = 1;
+			possibleFiles = _helper.GetPossibleFilenames ("test/pkg2/pkg3/ViewModel/test3VM");
+			Assert.That (possibleFiles.Count, Is.EqualTo (2));
+
+			//ViewModel
+			_helper.ReturnFileName = "test/pkg2/pkg3/test3ViewModel.cs";
+			_helper.NumberOfGetFileCallsToInvokeBeforeReturningTrue = 1;
+			possibleFiles = _helper.GetPossibleFilenames ("test/pkg2/pkg3/test3ViewModel");
+			Assert.That (possibleFiles.Count, Is.EqualTo (1));
+
+
+			_helper.ReturnFileName = "test/pkg2/pkg3/ViewModel/test3ViewModel.cs";
+			_helper.NumberOfGetFileCallsToInvokeBeforeReturningTrue = 1;
+			possibleFiles = _helper.GetPossibleFilenames ("test/pkg2/pkg3/ViewModel/test3ViewModel");
+			Assert.That (possibleFiles.Count, Is.EqualTo (2));
+
 
 		}
 

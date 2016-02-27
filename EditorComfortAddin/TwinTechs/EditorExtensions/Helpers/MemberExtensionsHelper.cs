@@ -8,6 +8,7 @@ using Mono.TextEditor;
 using MonoDevelop.Core;
 using System.IO;
 using Mono.CSharp;
+using ICSharpCode.NRefactory;
 
 namespace TwinTechs.EditorExtensions.Helpers
 {
@@ -201,6 +202,37 @@ namespace TwinTechs.EditorExtensions.Helpers
 					GotoMember (members [index - 1]);
 				}
 			}
+		}
+
+		public IUnresolvedTypeDefinition GetDeclaringTypeInDocument (TextLocation loc)
+		{
+			var editor = IdeApp.Workbench.ActiveDocument.Editor;
+			var parsedDoc = IdeApp.Workbench.ActiveDocument.ParsedDocument;
+
+			var declaringType = parsedDoc.GetInnermostTypeDefinition (loc);
+			if (declaringType == null) {
+				declaringType = parsedDoc.GetTopLevelTypeDefinition (loc);
+			}
+			if (declaringType == null) {
+				var entity = GetNearestEntity (true);
+				if (entity != null) {
+					if (entity.SymbolKind == SymbolKind.TypeDefinition) {
+						declaringType = entity as IUnresolvedTypeDefinition;
+					} else {
+						declaringType = entity.DeclaringTypeDefinition;
+					}
+				}
+			}
+			return declaringType;
+		}
+
+		public IUnresolvedTypeDefinition GetDeclaringTypeWithName (string typeName)
+		{
+			var entities = GetEntities ();
+			var declaringType = entities.FirstOrDefault (e => 
+				e.Name.EndsWith (typeName) && e.SymbolKind == SymbolKind.TypeDefinition
+			                    );
+			return declaringType as IUnresolvedTypeDefinition;
 		}
 
 		#endregion

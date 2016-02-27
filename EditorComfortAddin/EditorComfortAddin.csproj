@@ -19,6 +19,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
+    <LangVersion>6</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <Optimize>true</Optimize>
@@ -26,6 +27,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
+    <LangVersion>6</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -68,6 +70,7 @@
     <Compile Include="TwinTechs\EditorExtensions\Helpers\XamlHelper.cs" />
     <Compile Include="TwinTechs\EditorExtensions\Helpers\UnitTestHelper.cs" />
     <Compile Include="TwinTechs\EditorExtensions\Commands\ToggleUnitTestAndImplementation.cs" />
+    <Compile Include="TwinTechs\EditorExtensions\Commands\CreateUnitTestForMethod.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Manifest.addin.xml" />
@@ -94,6 +97,7 @@
     <Folder Include="TwinTechs\EditorExtensions\View\" />
     <Folder Include="TwinTechs\EditorExtensions\Extensions\" />
     <Folder Include="TwinTechs\EditorExtensions\Model\" />
+    <Folder Include="TwinTechs\EditorExtensions\Refactorings\" />
   </ItemGroup>
   <ProjectExtensions>
     <MonoDevelop>

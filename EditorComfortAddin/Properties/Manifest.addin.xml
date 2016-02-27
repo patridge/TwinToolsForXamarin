@@ -66,6 +66,13 @@
 			shortcut="Alt|Meta|t"
 			macShortcut="Alt|Meta|t"
 			defaultHandler="TwinTechs.EditorExtensions.Commands.ToggleUnitTestAndImplementation" />
+
+		<Command id="TwinTechs.EditorExtensions.Commands.CreateUnitTestForMethod"
+			_label="Generate Unit Test"
+			_description="Create unit test for current method"
+			shortcut="Shift|Alt|Meta|t"
+			macShortcut="Shift|Alt|Meta|t"
+			defaultHandler="TwinTechs.EditorExtensions.Commands.CreateUnitTestForMethod" />
 	</Extension>
 
 	<Extension path="/MonoDevelop/Ide/MainMenu/Search">
@@ -95,5 +102,8 @@
 		<SeparatorItem id="TwinAddinsSeparator3" />
 
 		<CommandItem id="TwinTechs.EditorExtensions.Commands.ToggleUnitTestAndImplementation" />
+		<!-- TODO MOVE ME -->
+
+		<CommandItem id="TwinTechs.EditorExtensions.Commands.CreateUnitTestForMethod" />
 	</Extension>
 </ExtensionModel>

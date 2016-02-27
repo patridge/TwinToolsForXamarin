@@ -17,7 +17,6 @@ namespace TwinTechs.EditorExtensions.Commands
 		{
 			var isEnabled = IdeApp.Workspace.GetIsWorkspaceOpen () && IdeApp.Workspace.GetIsDocumentOpen ();
 			isEnabled &= UnitTestHelper.Instance.IsTogglingPossibleForActiveDocument;
-			isEnabled = true;
 			info.Enabled = isEnabled;
 			info.Visible = true;
 		}

@@ -7,11 +7,14 @@ using System.Runtime.CompilerServices;
 using MonoDevelop.Projects;
 using System.Linq;
 using System.Text.RegularExpressions;
+using MonoDevelop.Ide.Gui;
 
 namespace TwinTechs.EditorExtensions.Helpers
 {
 	public class UnitTestHelper
 	{
+		string TestClassTemplate = "using System;\nusing NUnit.Framework;\n\nnamespace NAMESPACE\n{\n\t[TestFixture]\n\tpublic class CLASSNAME\n\t{\n\t\t[SetUp]\n\t\tpublic void Setup ()\n\t\t{\n\t\t}\n\n\t\t[TearDown]\n\t\tpublic void TearDown ()\n\t\t{\n\t\t}\n\t}\n}\n\n";
+
 		string[] AllPossiblePostfixesForFileMatching;
 		Dictionary<string,string> _statusTextsForFilePostFix = new Dictionary<string, string> {
 			["Tests.cs" ] = "-> TEST",
@@ -83,7 +86,7 @@ namespace TwinTechs.EditorExtensions.Helpers
 		public string TestsFileNameForActiveDocument {
 			get {
 				var rootFileName = GetRootFileNameForActiveDocument ();
-				var project = GetProject (false);
+				var project = GetProject (true);
 				if (rootFileName.EndsWith (".cs")) {
 					rootFileName = rootFileName.Replace (".cs", "Tests.cs");
 				}
@@ -126,7 +129,7 @@ namespace TwinTechs.EditorExtensions.Helpers
 			}
 		}
 
-		void GotoTestMethodInImplementationFile (string testMethodName)
+		public bool GotoTestMethodInImplementationFile (string testMethodName)
 		{
 			var implementationMethodName = UnitTestHelper.GetMethodNameFromTestName (testMethodName);
 			var entities = MemberExtensionsHelper.Instance.GetEntities ();
@@ -134,11 +137,13 @@ namespace TwinTechs.EditorExtensions.Helpers
 			foreach (var e in entities) {
 				if (e.Name.Contains (implementationMethodName)) {
 					MemberExtensionsHelper.Instance.GotoMember (e);
+					return true;
 				}
 			}
+			return false;
 		}
 
-		void GotoImplementationMethodInUnitTestFile (string implementationMethodName)
+		public bool GotoImplementationMethodInUnitTestFile (string implementationMethodName)
 		{
 			var entities = MemberExtensionsHelper.Instance.GetEntities ();
 			//TODO make filter
@@ -147,9 +152,11 @@ namespace TwinTechs.EditorExtensions.Helpers
 				foreach (var possibleName in possibleUnitTestNames) {
 					if (e.Name.Contains (possibleName)) {
 						MemberExtensionsHelper.Instance.GotoMember (e);
+						return true;
 					}
 				}
 			}
+			return false;
 		}
 
 		string[]GetPossibleUnitTestNames (string methodName)
@@ -170,6 +177,7 @@ namespace TwinTechs.EditorExtensions.Helpers
 				var projectPath = project.GetAbsoluteChildPath ("").ToString ();
 				if (projectPath?.Length < filePath.Length) {
 					var relativeFilePath = filename.ToString ().Substring (projectPath.Length);
+					relativeFilePath = relativeFilePath.Replace ("Tests.cs", ".cs");
 					return relativeFilePath;
 				} else {
 					return null;
@@ -187,23 +195,30 @@ namespace TwinTechs.EditorExtensions.Helpers
 			return filePath;
 		}
 
-		#region private impl
 
-		Project GetProject (bool isUnitTestProject)
+
+		public Project GetProject (bool isUnitTestProject)
 		{
 			var projectName = IdeApp.Workbench.ActiveDocument.Project.Name;
-			if (projectName.EndsWith ("Tests")) {
-				projectName = projectName.Remove (projectName.Length - "Tests".Length);
+			if (isUnitTestProject) {
+				if (!projectName.EndsWith ("Tests")) {
+					projectName += "Tests";
+				}
 			} else {
-				projectName += "Tests";
+				if (projectName.EndsWith ("Tests")) {
+					projectName = projectName.Remove (projectName.Length - "Tests".Length);
+				}
 			}
+
 			var project = IdeApp.Workspace.GetAllProjects ().FirstOrDefault ((p) => p.Name == projectName);
 			return project;
 		}
 
-		internal virtual bool OpenDocument (string filename, Project project)
+
+
+		public virtual bool OpenDocument (string filename, Project project)
 		{
-			if (!string.IsNullOrEmpty (filename)) {
+			if (!string.IsNullOrEmpty (filename) && File.Exists (filename)) {
 				var filePath = new FilePath (filename);
 				try {
 					
@@ -216,6 +231,43 @@ namespace TwinTechs.EditorExtensions.Helpers
 			StatusHelper.ShowStatus (MonoDevelop.Ide.Gui.Stock.StatusError, "Could not find associated file");
 			return false;
 		}
+
+		#region project level methods
+
+		public bool CreateTestFile (Project unitTestProject, string fileLocation)
+		{
+			var className = System.IO.Path.GetFileNameWithoutExtension (fileLocation);
+			var pathName = System.IO.Path.GetDirectoryName (fileLocation);
+			//TODO
+			var contents = TestClassTemplate.Replace ("NAMESPACE", "newNameSpace");
+			contents = contents.Replace ("CLASSNAME", className);
+			try {
+				if (!Directory.Exists (pathName)) {
+					Directory.CreateDirectory (pathName);
+				}
+				System.IO.File.WriteAllText (fileLocation, contents);
+				unitTestProject.AddFile (fileLocation);
+				IdeApp.ProjectOperations.Save (unitTestProject);
+				return true;
+			} catch (Exception ex) {
+				Console.WriteLine ("error creating unit test");
+				StatusHelper.ShowStatus (Stock.StatusError, "Couldn't create unit test file");
+				return false;
+			}
+
+		}
+
+		public bool CreateTestProject ()
+		{
+			//TODO not yet supported
+			StatusHelper.ShowStatus (Stock.StatusError, "Please create a unit test project and try again");
+			return false;
+		}
+
+		#endregion
+
+
+		#region private impl
 
 		internal string GetStatusPrefix (string filename)
 		{

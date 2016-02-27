@@ -73,6 +73,13 @@
 			shortcut="Shift|Alt|Meta|t"
 			macShortcut="Shift|Alt|Meta|t"
 			defaultHandler="TwinTechs.EditorExtensions.Commands.CreateUnitTestForMethod" />
+
+		<Command id="TwinTechs.EditorExtensions.Commands.FixNamespace"
+			_label="Fix Namespace"
+			_description="Sets namespace to match file location"
+			shortcut="Alt|Meta|n"
+			macShortcut="Alt|Meta|n"
+			defaultHandler="TwinTechs.EditorExtensions.Commands.FixNamespace" />
 	</Extension>
 
 	<Extension path="/MonoDevelop/Ide/MainMenu/Search">
@@ -104,6 +111,10 @@
 		<CommandItem id="TwinTechs.EditorExtensions.Commands.ToggleUnitTestAndImplementation" />
 		<!-- TODO MOVE ME -->
 
+		<SeparatorItem id="TwinAddinsSeparator3" />
+
 		<CommandItem id="TwinTechs.EditorExtensions.Commands.CreateUnitTestForMethod" />
+
+		<CommandItem id="TwinTechs.EditorExtensions.Commands.FixNamespace" />
 	</Extension>
 </ExtensionModel>

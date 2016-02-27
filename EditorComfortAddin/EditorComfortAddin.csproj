@@ -71,6 +71,8 @@
     <Compile Include="TwinTechs\EditorExtensions\Helpers\UnitTestHelper.cs" />
     <Compile Include="TwinTechs\EditorExtensions\Commands\ToggleUnitTestAndImplementation.cs" />
     <Compile Include="TwinTechs\EditorExtensions\Commands\CreateUnitTestForMethod.cs" />
+    <Compile Include="TwinTechs\EditorExtensions\Commands\FixNamespace.cs" />
+    <Compile Include="TwinTechs\EditorExtensions\Helpers\DocumentHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Manifest.addin.xml" />

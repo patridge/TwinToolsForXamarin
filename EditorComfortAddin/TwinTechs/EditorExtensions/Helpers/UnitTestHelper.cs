@@ -132,6 +132,9 @@ namespace TwinTechs.EditorExtensions.Helpers
 		public bool GotoTestMethodInImplementationFile (string testMethodName)
 		{
 			var implementationMethodName = UnitTestHelper.GetMethodNameFromTestName (testMethodName);
+			if (implementationMethodName == "Constructor") {
+				implementationMethodName = ".ctor";
+			}
 			var entities = MemberExtensionsHelper.Instance.GetEntities ();
 			//TODO make filter
 			foreach (var e in entities) {
@@ -236,11 +239,20 @@ namespace TwinTechs.EditorExtensions.Helpers
 
 		public bool CreateTestFile (Project unitTestProject, string fileLocation)
 		{
-			var className = System.IO.Path.GetFileNameWithoutExtension (fileLocation);
+			var implementationClassName = System.IO.Path.GetFileNameWithoutExtension (ImplementationFileNameForActiveDocument);
+			var declaringType = MemberExtensionsHelper.Instance.GetDeclaringTypeWithName (implementationClassName);
+			if (declaringType == null) {
+				return false;
+			}
+
+			var unitTestClassName = declaringType.Namespace;
 			var pathName = System.IO.Path.GetDirectoryName (fileLocation);
-			//TODO
-			var contents = TestClassTemplate.Replace ("NAMESPACE", "newNameSpace");
-			contents = contents.Replace ("CLASSNAME", className);
+
+			//TODO get root namespace of both impl/test projects, if required and set accordingly
+			var nameSpace = "";
+			nameSpace += declaringType.Namespace;
+			var contents = TestClassTemplate.Replace ("NAMESPACE", nameSpace);
+			contents = contents.Replace ("CLASSNAME", unitTestClassName);
 			try {
 				if (!Directory.Exists (pathName)) {
 					Directory.CreateDirectory (pathName);

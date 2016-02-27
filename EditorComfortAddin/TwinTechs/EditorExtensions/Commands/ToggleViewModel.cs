@@ -15,9 +15,10 @@ namespace TwinTechs.EditorExtensions.Commands
 
 		protected override void Update (CommandInfo info)
 		{
-			var isEnabled = IdeApp.Workspace.GetIsWorkspaceOpen () && IdeApp.Workspace.GetIsDocumentOpen ();
-			isEnabled &= ViewModelHelper.Instance.IsTogglingPossibleForActiveDocument;
-			isEnabled &= ViewModelHelper.Instance.IsActiveFileAViewFile;
+			var isEnabled = IdeApp.Workspace.GetIsWorkspaceOpen () && IdeApp.Workspace.GetIsDocumentOpen ()
+			                && ViewModelHelper.Instance.IsActiveFileAViewFile
+			                && ViewModelHelper.Instance.IsTogglingPossibleForActiveDocument;
+			
 
 			//TODO check if document is xaml/codebehind/vm
 			info.Enabled = isEnabled;

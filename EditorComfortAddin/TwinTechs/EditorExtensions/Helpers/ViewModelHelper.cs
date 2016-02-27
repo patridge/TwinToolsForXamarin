@@ -53,9 +53,9 @@ namespace TwinTechs.EditorExtensions.Helpers
 
 		public bool IsTogglingPossibleForActiveDocument {
 			get {
-				return VMFileNameForActiveDocument != null &&
-				GetFileExists (XamlFileNameForActiveDocument) &&
-				GetFileExists (CodeBehindFileNameForActiveDocument);
+				return VMFileNameForActiveDocument != null
+				&& XamlFileNameForActiveDocument != null
+				&& CodeBehindFileNameForActiveDocument != null;
 			}
 		}
 
@@ -163,12 +163,15 @@ namespace TwinTechs.EditorExtensions.Helpers
 		public string CodeBehindFileNameForActiveDocument {
 			get {
 				var filename = RootFileNameForActiveDocument;
-				if (filename != null) {
-					return filename + ".xaml.cs";
-				} else {
-					return null;
+
+				var possiblefileNames = GetPossibleFilenames (filename);
+				foreach (var possibleFilename in possiblefileNames) {
+					var targetFileName = possibleFilename + ".xaml.cs";
+					if (GetFileExists (targetFileName)) {
+						return targetFileName;
+					}
 				}
-				
+				return null;
 			}
 		}
 

@@ -200,16 +200,19 @@ namespace TwinTechs.EditorExtensions.Helpers
 		}
 
 
-		[TestCase ("test/pkg2/pkg3/test3.xaml", 2, ExpectedResult = "test/pkg2/pkg3/test3.xaml.cs")]
-		[TestCase ("test/pkg2/pkg3/test3.xaml.cs", 2, ExpectedResult = "test/pkg2/pkg3/test3ViewModel.cs")]
-		[TestCase ("test/pkg2/pkg3/test3.cs", 2, ExpectedResult = null)]
-		[TestCase ("test/pkg2/pkg3/test3VM.cs", 2, ExpectedResult = "test/pkg2/pkg3/test3.xaml.cs")]
-		[TestCase ("test/pkg2/pkg3/test3ViewModel.cs", 2, ExpectedResult = "test/pkg2/pkg3/test3.xaml.cs")]
+		[TestCase ("test/pkg2/pkg3/test3.xaml", null, ExpectedResult = "test/pkg2/pkg3/test3.xaml.cs")]
+		[TestCase ("test/pkg2/pkg3/test3.xaml.cs", new string[]{ "test/pkg2/pkg3/test3VM.cs" }, ExpectedResult = "test/pkg2/pkg3/test3ViewModel.cs")]
+		[TestCase ("test/pkg2/pkg3/test3.cs", null, ExpectedResult = null)]
+		[TestCase ("test/pkg2/pkg3/test3VM.cs", null, ExpectedResult = "test/pkg2/pkg3/test3.xaml.cs")]
+		[TestCase ("test/pkg2/pkg3/test3ViewModel.cs", null, ExpectedResult = "test/pkg2/pkg3/test3.xaml.cs")]
 
-		public string TestToggleVMAndCodeBehind (string fileName, int numberOfTimesToInvokeFileExists)
+		public string TestToggleVMAndCodeBehind (string fileName, string[] filesForcedToNotExist)
 		{
 			_helper.ReturnFileName = fileName;
-			_helper.NumberOfGetFileCallsToInvokeBeforeReturningTrue = numberOfTimesToInvokeFileExists;
+			_helper.NumberOfGetFileCallsToInvokeBeforeReturningTrue = null;
+			if (filesForcedToNotExist != null) {
+				_helper.FilesThatWillNotExist = filesForcedToNotExist;
+			}
 			_helper.ToggleVMAndCodeBehind ();
 			return _helper.FilenamePassedToOpenDocumentMethod;
 		}

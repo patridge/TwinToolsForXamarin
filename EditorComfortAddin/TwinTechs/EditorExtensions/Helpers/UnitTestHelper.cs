@@ -15,8 +15,9 @@ namespace TwinTechs.EditorExtensions.Helpers
 	{
 		string TestClassTemplate = "using System;\nusing NUnit.Framework;\n\nnamespace NAMESPACE\n{\n\t[TestFixture]\n\tpublic class CLASSNAME\n\t{\n\t\t[SetUp]\n\t\tpublic void Setup ()\n\t\t{\n\t\t}\n\n\t\t[TearDown]\n\t\tpublic void TearDown ()\n\t\t{\n\t\t}\n\t}\n}\n\n";
 
-		string[] AllPossiblePostfixesForFileMatching;
-		Dictionary<string,string> _statusTextsForFilePostFix = new Dictionary<string, string> {
+		string[] AllPossibleSuffixesForFileMatching;
+		string[] ProjectSuffixes;
+		Dictionary<string,string> _statusTextsForFileSuffix = new Dictionary<string, string> {
 			["Tests.cs" ] = "-> TEST",
 			[".cs" ] = "-> IMPL",
 		};
@@ -34,7 +35,8 @@ namespace TwinTechs.EditorExtensions.Helpers
 
 		public UnitTestHelper ()
 		{
-			AllPossiblePostfixesForFileMatching = new string[]{ "Tests.cs", ".cs" };
+			AllPossibleSuffixesForFileMatching = new string[]{ "Tests.cs", ".cs" };
+			ProjectSuffixes = new string[]{ "Tests", ".Tests" };
 		}
 
 		#region methods that are virtual to facilitate unit testing
@@ -74,9 +76,9 @@ namespace TwinTechs.EditorExtensions.Helpers
 		public string RootFileNameForActiveDocument {
 			get {
 				var file = CurrentFileName;
-				foreach (var postfix in AllPossiblePostfixesForFileMatching) {
-					if (file.EndsWith (postfix)) {
-						return file.Replace (postfix, "");
+				foreach (var suffix in AllPossibleSuffixesForFileMatching) {
+					if (file.EndsWith (suffix)) {
+						return file.Replace (suffix, "");
 					}
 				}
 				return null;
@@ -202,18 +204,25 @@ namespace TwinTechs.EditorExtensions.Helpers
 
 		public Project GetProject (bool isUnitTestProject)
 		{
-			var projectName = IdeApp.Workbench.ActiveDocument.Project.Name;
-			if (isUnitTestProject) {
-				if (!projectName.EndsWith ("Tests")) {
-					projectName += "Tests";
+			Project project = null;
+			foreach (var suffix in ProjectSuffixes) {
+				var projectName = IdeApp.Workbench.ActiveDocument.Project.Name;
+				
+				if (isUnitTestProject) {
+					if (!projectName.EndsWith (suffix)) {
+						projectName += suffix;
+					}
+				} else {
+					if (projectName.EndsWith (suffix)) {
+						projectName = projectName.Remove (projectName.Length - suffix.Length);
+					}
 				}
-			} else {
-				if (projectName.EndsWith ("Tests")) {
-					projectName = projectName.Remove (projectName.Length - "Tests".Length);
+
+				project = IdeApp.Workspace.GetAllProjects ().FirstOrDefault ((p) => p.Name == projectName);
+				if (project != null) {
+					break;
 				}
 			}
-
-			var project = IdeApp.Workspace.GetAllProjects ().FirstOrDefault ((p) => p.Name == projectName);
 			return project;
 		}
 
@@ -282,9 +291,9 @@ namespace TwinTechs.EditorExtensions.Helpers
 
 		internal string GetStatusPrefix (string filename)
 		{
-			foreach (var key in _statusTextsForFilePostFix.Keys) {
+			foreach (var key in _statusTextsForFileSuffix.Keys) {
 				if (filename.EndsWith (key)) {
-					return _statusTextsForFilePostFix [key];
+					return _statusTextsForFileSuffix [key];
 				}
 			}
 			return null;

@@ -9,9 +9,9 @@ namespace TwinTechs.EditorExtensions.Helpers
 {
 	public class ViewModelHelper
 	{
-		string[] ViewModelPostfixes;
-		string[] AllPossiblePostfixesForFileMatching;
-		Dictionary<string,string> _statusTextsForFilePostFix = new Dictionary<string, string> {
+		string[] ViewModelSuffixes;
+		string[] AllPossibleSuffixesForFileMatching;
+		Dictionary<string,string> _statusTextsForFileSuffix = new Dictionary<string, string> {
 			[".xaml.cs" ] = "-> CB",
 			[".xaml" ] = "-> XAML",
 			["VM.cs" ] = "-> VM",
@@ -31,8 +31,8 @@ namespace TwinTechs.EditorExtensions.Helpers
 
 		public ViewModelHelper ()
 		{
-			ViewModelPostfixes = new string[]{ "VM.cs", "ViewModel.cs" };
-			AllPossiblePostfixesForFileMatching = new string[]{ ".xaml.cs", ".xaml", "VM.cs", "ViewModel.cs" };
+			ViewModelSuffixes = new string[]{ "VM.cs", "ViewModel.cs" };
+			AllPossibleSuffixesForFileMatching = new string[]{ ".xaml.cs", ".xaml", "VM.cs", "ViewModel.cs" };
 		}
 
 		#region methods that are virtual to facilitate unit testing
@@ -79,8 +79,8 @@ namespace TwinTechs.EditorExtensions.Helpers
 		public bool IsActiveFileViewModel {
 			get {
 				var file = CurrentFileName;
-				foreach (var viewModelPostFix in ViewModelPostfixes) {
-					if (file.EndsWith (viewModelPostFix)) {
+				foreach (var viewModelSuffix in ViewModelSuffixes) {
+					if (file.EndsWith (viewModelSuffix)) {
 						return true;
 					}
 				}
@@ -91,9 +91,9 @@ namespace TwinTechs.EditorExtensions.Helpers
 		public string RootFileNameForActiveDocument {
 			get {
 				var file = CurrentFileName;
-				foreach (var postfix in AllPossiblePostfixesForFileMatching) {
-					if (file.EndsWith (postfix)) {
-						return file.Replace (postfix, "");
+				foreach (var suffix in AllPossibleSuffixesForFileMatching) {
+					if (file.EndsWith (suffix)) {
+						return file.Replace (suffix, "");
 					}
 				}
 				return null;
@@ -115,8 +115,8 @@ namespace TwinTechs.EditorExtensions.Helpers
 			get {
 				var filename = RootFileNameForActiveDocument;
 				if (filename != null) {
-					foreach (var viewModelPostFix in ViewModelPostfixes) {
-						var targetFileName = filename + viewModelPostFix;
+					foreach (var viewModelSuffix in ViewModelSuffixes) {
+						var targetFileName = filename + viewModelSuffix;
 						if (GetFileExists (targetFileName)) {
 							return targetFileName;
 						}
@@ -180,9 +180,9 @@ namespace TwinTechs.EditorExtensions.Helpers
 
 		internal string GetStatusPrefix (string filename)
 		{
-			foreach (var key in _statusTextsForFilePostFix.Keys) {
+			foreach (var key in _statusTextsForFileSuffix.Keys) {
 				if (filename.EndsWith (key)) {
-					return _statusTextsForFilePostFix [key];
+					return _statusTextsForFileSuffix [key];
 				}
 			}
 			return null;

@@ -244,8 +244,7 @@ namespace TwinTechs.EditorExtensions.Helpers
 			if (declaringType == null) {
 				return false;
 			}
-
-			var unitTestClassName = declaringType.Namespace;
+			var unitTestClassName = System.IO.Path.GetFileNameWithoutExtension (TestsFileNameForActiveDocument);
 			var pathName = System.IO.Path.GetDirectoryName (fileLocation);
 
 			//TODO get root namespace of both impl/test projects, if required and set accordingly

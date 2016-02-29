@@ -16,8 +16,9 @@ using System.Collections;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Runtime.InteropServices;
+using TwinTechs.EditorExtensions.Helpers;
 
-namespace TwinTechs.EditorExtensions
+namespace TwinTechs.EditorExtensions.View
 {
 
 	public class RecentFileListWindow : Gtk.Dialog
@@ -28,6 +29,8 @@ namespace TwinTechs.EditorExtensions
 		bool keyHandled = false;
 		Collection<FileOpenInformation> _filteredDocuments;
 		FileOpenInformation _selectedDocument;
+
+		ScrolledWindow _scrolledWindow;
 
 		Gtk.Label _pathLabel;
 
@@ -45,14 +48,17 @@ namespace TwinTechs.EditorExtensions
 			VBox.Add (_searchView);
 
 			CreateTree ();
-			VBox.Add (_treeView);
-
+			_scrolledWindow = new Gtk.ScrolledWindow ();
+			_scrolledWindow.SetSizeRequest (500, 600);
+			_scrolledWindow.Add (_treeView);
+			VBox.Add (_scrolledWindow);
 			_pathLabel = new Gtk.Label ();
 			_pathLabel.SetSizeRequest (500, 40);
 			VBox.Add (_pathLabel);
 
 			MemberExtensionsHelper.Instance.IsDirty = true;
 			UpdateDocuments ();
+			VBox.SetSizeRequest (500, 700);
 			this.SetSizeRequest (500, 700);
 
 			CanFocus = true;
@@ -260,6 +266,7 @@ namespace TwinTechs.EditorExtensions
 				}
 			};
 
+
 		}
 
 		void _treeView_Selection_Changed (object sender, EventArgs e)
@@ -271,8 +278,23 @@ namespace TwinTechs.EditorExtensions
 				_selectedDocument = _filteredDocuments [index];
 				_selectedIndex = index;
 			}
+			UpdateSrollPosition ();
 			_searchView.GrabFocus ();
 			_searchView.SelectRegion (_searchView.Text.Length, _searchView.Text.Length);
+		}
+
+		void UpdateSrollPosition ()
+		{
+			var rowHeight = 22;
+			var newOffset = _selectedIndex * rowHeight;
+			var currentLower = _scrolledWindow.Vadjustment.Value;
+			var currentUpper = _scrolledWindow.Vadjustment.Value + _scrolledWindow.Vadjustment.PageSize;
+
+			if (newOffset <= currentLower) {
+				_scrolledWindow.Vadjustment.Value = newOffset;
+			} else if (newOffset >= currentUpper - (_scrolledWindow.Vadjustment.PageSize / 2)) {
+				_scrolledWindow.Vadjustment.Value = newOffset - (_scrolledWindow.Vadjustment.PageSize / 2);
+			}
 		}
 
 		void CloseWindow (bool moveToSelectedEntry = false)
@@ -322,6 +344,7 @@ namespace TwinTechs.EditorExtensions
 					SelectRowIndex (0);
 				}
 			}
+			UpdateSrollPosition ();
 		}
 
 		#endregion

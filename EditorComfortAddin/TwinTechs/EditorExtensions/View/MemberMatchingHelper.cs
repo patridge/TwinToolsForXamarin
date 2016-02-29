@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text;
 
-namespace TwinTechs.EditorExtensions
+namespace TwinTechs.EditorExtensions.View
 {
 	public static class MemberMatchingHelper
 	{

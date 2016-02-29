@@ -9,13 +9,13 @@ using System.IO;
 using System.Linq;
 using MonoDevelop.Projects;
 
-namespace TwinTechs.EditorExtensions
+namespace TwinTechs.EditorExtensions.Helpers
 {
 	public class FileHistoryHelper
 	{
 		static FileHistoryHelper _instance;
 		Collection<FileOpenInformation> _recentDocuments;
-		const int MaxDocuments = 30;
+		const int MaxDocuments = 100;
 		MonoDevelop.Ide.Gui.Document _previousDocument;
 		Solution _loadedSolution;
 
@@ -68,7 +68,7 @@ namespace TwinTechs.EditorExtensions
 				var document = IdeApp.Workbench.ActiveDocument;
 				if (document != null && document.FileName != null) {
 					
-					var existingFileInfo = _recentDocuments.FirstOrDefault ((arg) => arg.Project == document.Project && arg.FileName.FullPath == document.FileName.FullPath);
+					var existingFileInfo = _recentDocuments.FirstOrDefault ((arg) => arg.Project.ItemId == document.Project.ItemId && arg.FileName.FullPath == document.FileName.FullPath);
 					var lineNumber = existingFileInfo?.Line ?? 1;
 					var column = existingFileInfo?.Column ?? 1;
 					UpdateFileOpenInfo (document, lineNumber, column);
@@ -84,13 +84,19 @@ namespace TwinTechs.EditorExtensions
 		{
 			try {
 				
-				var existingFileInfo = _recentDocuments.FirstOrDefault ((arg) => arg.Project == document.Project && arg.FileName.FullPath == document.FileName.FullPath);
+				var existingFileInfo = _recentDocuments.FirstOrDefault ((arg) => arg.Project.ItemId == document.Project.ItemId && arg.FileName.FullPath == document.FileName.FullPath);
 				if (existingFileInfo != null) {
 					_recentDocuments.Remove (existingFileInfo);
 				}
 				if (GetProjectWithId (document.Project.ItemId) != null && File.Exists (document.FileName.FullPath)) {
 					var fileInfo = new FileOpenInformation (document.FileName.FullPath, document.Project, line, column, OpenDocumentOptions.BringToFront | OpenDocumentOptions.TryToReuseViewer);
 					_recentDocuments.Insert (0, fileInfo);
+				}
+				if (_recentDocuments.Count >= MaxDocuments) {
+					var numberOfDocumentsToPurge = _recentDocuments.Count - MaxDocuments;
+					for (int i = 0; i < numberOfDocumentsToPurge; i++) {
+						_recentDocuments.RemoveAt (_recentDocuments.Count - 1);
+					}
 				}
 			} catch (Exception ex) {
 				Console.WriteLine ("error updating file info " + ex.Message);
@@ -135,10 +141,13 @@ namespace TwinTechs.EditorExtensions
 					var column = int.Parse (item [3]);
 					if (project != null && File.Exists (item [0])) {
 						var fileOpenInformation = new FileOpenInformation (item [0], project, line, column, OpenDocumentOptions.BringToFront | OpenDocumentOptions.TryToReuseViewer);
-						historyItems.Add (fileOpenInformation);
+						var isDupliate = historyItems.FirstOrDefault (info => info.Project.ItemId == project.ItemId &&
+						                 info.FileName == item [0]) != null;
+						if (!isDupliate && historyItems.Count < MaxDocuments) {
+							historyItems.Add (fileOpenInformation);
+						}
 					}
 				}
-				//TODO - need to refactor the _recentDocuments to store FileOpenInformation objects
 			} catch (Exception e) {
 				Console.WriteLine ("error loading history " + e.Message);
 			}

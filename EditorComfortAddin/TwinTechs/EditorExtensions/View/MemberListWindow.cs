@@ -20,27 +20,34 @@ using Mono.CSharp;
 using Mono.CSharp.Linq;
 using ICSharpCode.NRefactory.TypeSystem.Implementation;
 using MonoDevelop.Ide.TypeSystem;
+using TwinTechs.EditorExtensions.Helpers;
+using TwinTechs.EditorExtensions.Extensions;
 
-namespace TwinTechs.EditorExtensions
+namespace TwinTechs.EditorExtensions.View
 {
 
 	public class MemberListWindow : Gtk.Dialog
 	{
+		IUnresolvedEntity SelectedEntity { get; set; }
+
 		Gtk.TreeView _treeView;
 		Gtk.Entry _searchView;
 		Gtk.ListStore _listStore;
+
+		ScrolledWindow _scrolledWindow;
+
 		bool keyHandled = false;
 		Collection<IUnresolvedEntity> _filteredEntities;
-		IUnresolvedEntity _selectedEntry;
 
 		int _selectedIndex;
 
-		public MemberListWindow (string title, Gtk.Window parent, DialogFlags flags, params object[] button_data) : base (title, parent, flags, button_data)
+		public MemberListWindow (string title, Gtk.Window parent, DialogFlags flags, IUnresolvedEntity selectedEntry, params object[] button_data) : base (title, parent, flags, button_data)
 		{
 			if (IdeApp.Workbench == null) {
 				return;
 			}
-			var rootWindow = IdeApp.Workbench.RootWindow;
+			SelectedEntity = selectedEntry;
+
 			_searchView = new Gtk.Entry ("");
 			_searchView.SetSizeRequest (500, 40);
 			_searchView.Changed += _searchView_Changed;
@@ -50,7 +57,10 @@ namespace TwinTechs.EditorExtensions
 			VBox.Add (_searchView);
 
 			CreateTree ();
-			VBox.Add (_treeView);
+			_scrolledWindow = new Gtk.ScrolledWindow ();
+			_scrolledWindow.SetSizeRequest (500, 600);
+			_scrolledWindow.Add (_treeView);
+			VBox.Add (_scrolledWindow);
 
 			MemberExtensionsHelper.Instance.IsDirty = true;
 			UpdateMembers ();
@@ -153,12 +163,12 @@ namespace TwinTechs.EditorExtensions
 			case Gdk.Key.ISO_Enter:
 			case Gdk.Key.Key_3270_Enter:
 			case Gdk.Key.KP_Enter:
-				if (_selectedEntry != null) {
+				if (SelectedEntity != null) {
 					return KeyActions.Complete | KeyActions.Ignore | KeyActions.CloseWindow;
 				}
 				return KeyActions.Ignore;
 			case Gdk.Key.Escape:
-				_selectedEntry = null;
+				SelectedEntity = null;
 				return KeyActions.Ignore | KeyActions.CloseWindow;
 			case Gdk.Key.Down:
 				if (_selectedIndex + 1 < _filteredEntities.Count) {
@@ -261,7 +271,7 @@ namespace TwinTechs.EditorExtensions
 			_treeView.AppendColumn (typeColumn);
 			_treeView.AppendColumn (nameColumn);
 
-			typeColumn.AddAttribute (typeCell, "text", 0);
+			typeColumn.AddAttribute (typeCell, "stock-id", 0);
 			nameColumn.AddAttribute (nameCell, "text", 1);
 
 			_treeView.Selection.Mode = Gtk.SelectionMode.Single;
@@ -270,7 +280,7 @@ namespace TwinTechs.EditorExtensions
 			_treeView.KeyPressEvent += HandleKeyPressEvent;
 			_treeView.KeyReleaseEvent += HandleKeyReleaseEvent;
 			_treeView.ButtonReleaseEvent += (o, args) => {
-				if (_selectedEntry != null) {
+				if (SelectedEntity != null) {
 					CloseWindow (true);
 				}
 			};
@@ -300,18 +310,33 @@ namespace TwinTechs.EditorExtensions
 			if (selectedRows != null && selectedRows.Length > 0) {
 				var row = selectedRows [0];
 				var index = row.Indices [0];
-				_selectedEntry = _filteredEntities [index];
+				SelectedEntity = _filteredEntities [index];
 				_selectedIndex = index;
 			}
+			UpdateSrollPosition ();
 			_searchView.GrabFocus ();
 			_searchView.SelectRegion (_searchView.Text.Length, _searchView.Text.Length);
 		}
 
+		void UpdateSrollPosition ()
+		{
+			//TODO - get rowheight from treeview.. somehow
+			var rowHeight = 22;
+			var newOffset = _selectedIndex * rowHeight;
+			var currentLower = _scrolledWindow.Vadjustment.Value;
+			var currentUpper = _scrolledWindow.Vadjustment.Value + _scrolledWindow.Vadjustment.PageSize;
+
+			if (newOffset <= currentLower) {
+				_scrolledWindow.Vadjustment.Value = newOffset;
+			} else if (newOffset >= currentUpper - (_scrolledWindow.Vadjustment.PageSize / 2)) {
+				_scrolledWindow.Vadjustment.Value = newOffset - (_scrolledWindow.Vadjustment.PageSize / 2);
+			}
+		}
 
 		void CloseWindow (bool moveToSelectedEntry = false)
 		{
-			if (_selectedEntry != null) {
-				MemberExtensionsHelper.Instance.GotoMember (_selectedEntry);
+			if (SelectedEntity != null) {
+				MemberExtensionsHelper.Instance.GotoMember (SelectedEntity);
 			}
 
 			Gtk.Application.Invoke ((s, ev) => DestroyWindow ());
@@ -358,12 +383,13 @@ namespace TwinTechs.EditorExtensions
 			}
 			_treeView.Model = _listStore;
 
-			if (_selectedEntry != null) {
-				var newIndex = _filteredEntities.IndexOf (_selectedEntry);
+			if (SelectedEntity != null) {
+				var newIndex = _filteredEntities.IndexOf (s => s.FullName.Equals (SelectedEntity.FullName));
 				SelectRowIndex (newIndex == -1 ? 0 : newIndex);
 			} else {
 				SelectRowIndex (0);
 			}
+			UpdateSrollPosition ();
 		}
 
 		static string GetParameters (IUnresolvedEntity entity)

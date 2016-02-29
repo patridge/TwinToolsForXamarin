@@ -8,12 +8,15 @@ using Mono.TextEditor;
 using MonoDevelop.Core;
 using System.IO;
 using Mono.CSharp;
+using ICSharpCode.NRefactory;
 
-namespace TwinTechs.EditorExtensions
+namespace TwinTechs.EditorExtensions.Helpers
 {
 
-	internal class MemberExtensionsHelper
+	public class MemberExtensionsHelper
 	{
+
+
 		static MemberExtensionsHelper _instance;
 		Document _mostRecentDocument;
 
@@ -60,6 +63,7 @@ namespace TwinTechs.EditorExtensions
 
 			if (IsDirty || _cachedEntities == null) {
 				IdeApp.Workbench.ActiveDocument.UpdateParseDocument ();
+				parsedDoc = IdeApp.Workbench.ActiveDocument.ParsedDocument;
 				_cachedEntities = new Collection<IUnresolvedEntity> ();
 				foreach (var typeDef in parsedDoc.TopLevelTypeDefinitions) {
 					//TODO pretty print these
@@ -91,6 +95,33 @@ namespace TwinTechs.EditorExtensions
 			}
 		}
 
+		public void GotoMemberWithName (string memberName)
+		{
+			var editor = IdeApp.Workbench.ActiveDocument.Editor;
+			var entities = GetEntities ();
+			foreach (var entity in entities) {
+				if (entity.Name.EndsWith (memberName)) {
+					var region = entity.Region;
+					editor.SetCaretTo (region.BeginLine, region.BeginColumn, true, false);
+					editor.CenterToCaret ();	
+				}
+			}
+		}
+
+		public IMember GetMemberWithName (string memberName)
+		{
+			var editor = IdeApp.Workbench.ActiveDocument.Editor;
+			var entities = GetEntities ();
+			foreach (var entity in entities) {
+				if (entity.Name.EndsWith (memberName)) {
+					return entity as IMember;
+				}
+			}
+			return null;
+		}
+
+
+
 		/// <summary>
 		/// Gets the entity at caret.
 		/// </summary>
@@ -99,7 +130,6 @@ namespace TwinTechs.EditorExtensions
 		{
 			var editor = IdeApp.Workbench.ActiveDocument.Editor;
 
-			var parsedDoc = IdeApp.Workbench.ActiveDocument.ParsedDocument;
 			//TODO cache these bad boys
 			var entities = GetEntities ();
 			foreach (var entity in entities) {
@@ -188,66 +218,35 @@ namespace TwinTechs.EditorExtensions
 			}
 		}
 
-		/// <summary>
-		/// Assumptions
-		/// 1. the view model is described in the classes type specifier of xaml page
-		/// 2. the viewmodel and xaml files will be in the same project
-		/// TODO filter betwee
-		/// x:TypeArguments="package.Class"
-		/// </summary>
-		public void ToggleVMXamlCs (bool preferCodeBehind = false)
+		public IUnresolvedTypeDefinition GetDeclaringTypeInDocument (TextLocation loc)
 		{
-			var file = IdeApp.Workbench.ActiveDocument.FileName.FullPath.ToString ();
-			var isXamlFile = file.Contains (".xaml");
+			var editor = IdeApp.Workbench.ActiveDocument.Editor;
+			var parsedDoc = IdeApp.Workbench.ActiveDocument.ParsedDocument;
 
-			if (isXamlFile) {
-				if (file.EndsWith (".xaml.cs")) {
-					file = file.Replace (".xaml.cs", ".xaml");
-				}
-				OpenVMDocument (file);
-			} else {
-				
-				OpenXamlDocument (file, preferCodeBehind);
+			var declaringType = parsedDoc.GetInnermostTypeDefinition (loc);
+			if (declaringType == null) {
+				declaringType = parsedDoc.GetTopLevelTypeDefinition (loc);
 			}
+			if (declaringType == null) {
+				var entity = GetNearestEntity (true);
+				if (entity != null) {
+					if (entity.SymbolKind == SymbolKind.TypeDefinition) {
+						declaringType = entity as IUnresolvedTypeDefinition;
+					} else {
+						declaringType = entity.DeclaringTypeDefinition;
+					}
+				}
+			}
+			return declaringType;
 		}
 
-		/// <summary>
-		/// Opens the xaml document.
-		/// </summary>
-		/// <param name="fileName">File name.</param>
-		/// <param name="gotoCodeBehind">If set to <c>true</c> goto code behind.</param>
-		public void OpenXamlDocument (string fileName, bool gotoCodeBehind = false)
+		public IUnresolvedTypeDefinition GetDeclaringTypeWithName (string typeName)
 		{
-			
-			//jump back to xaml file - do this based on the class containing vm or viewmodel extension
-
-			foreach (var viewModelPostFix in new string[]{"VM.cs","ViewModel.cs"}) {
-				if (fileName.Contains (viewModelPostFix)) {
-					var fileExtension = gotoCodeBehind ? ".xaml.cs" : ".xaml";
-					var targetFileName = fileName.Replace (viewModelPostFix, fileExtension);
-					//for now assume in the same folder
-					var filePath = new FilePath (targetFileName);
-					IdeHelper.OpenDocument (filePath);
-					break;
-				}
-			}
-		}
-
-		/// <summary>
-		/// Opens the VM document.
-		/// </summary>
-		/// <param name="fileName">File name.</param>
-		public void OpenVMDocument (string fileName)
-		{
-			foreach (var viewModelPostFix in new string[]{"VM.cs","ViewModel.cs"}) {
-				var targetFileName = fileName.Replace (".xaml", viewModelPostFix);
-				if (File.Exists (targetFileName)) {
-					var filePath = new FilePath (targetFileName);
-					//for now assume in the same folder
-					IdeHelper.OpenDocument (filePath);
-					break;
-				}
-			}
+			var entities = GetEntities ();
+			var declaringType = entities.FirstOrDefault (e => 
+				e.Name.EndsWith (typeName) && e.SymbolKind == SymbolKind.TypeDefinition
+			                    );
+			return declaringType as IUnresolvedTypeDefinition;
 		}
 
 		#endregion

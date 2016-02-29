@@ -1,51 +1,120 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <ExtensionModel>
+
 	<Extension path="/MonoDevelop/Ide/Commands">
-		<Command id="TwinTechs.EditorExtensions.ShowMembers"
+
+		<Command id="TwinTechs.EditorExtensions.Commands.BrowseRecentDocument"
+			_label="Browse recent documents"
+			_description="Browse recently opened documents"
+			shortcut="Meta|E"
+			macShortcut="Meta|E"
+			defaultHandler="TwinTechs.EditorExtensions.Commands.ShowRecentDocumentBrowser" />
+
+		<Command id="TwinTechs.EditorExtensions.Commands.GoToDeclarationPlus"
+			_label="Go to Declaration+"
+			_description="Advanced version of go to declaration. Can go direct to implementing classes, and some Xaml types."
+			shortcut="Meta|b"
+			macShortcut="Meta|b"
+			defaultHandler="TwinTechs.EditorExtensions.Commands.GoToDeclarationPlus" />
+
+		<Command id="TwinTechs.EditorExtensions.Commands.ShowMembers"
 			_label="Show Members"
 			_description="Toggle members"
 			shortcut="Ctrl|F12"
 			macShortcut="Ctrl|F12"
-			defaultHandler="TwinTechs.EditorExtensions.ShowMembers" />
-		<Command id="TwinTechs.EditorExtensions.PreviousMember"
+			defaultHandler="TwinTechs.EditorExtensions.Commands.ShowMembers" />
+
+		<Command id="TwinTechs.EditorExtensions.Commands.PreviousMember"
 			_label="Previous Member"
-			_description="Previous Member"
+			_description="Goes to the previous member in a code file"
 			shortcut="Ctrl|Up"
 			macShortcut="Ctrl|Up"
-			defaultHandler="TwinTechs.EditorExtensions.PreviousMember" />
+			defaultHandler="TwinTechs.EditorExtensions.Commands.PreviousMember" />
 
-		<Command id="TwinTechs.EditorExtensions.NextMember"
-			_label="Next Membber"
-			_description="Next Membber"
+		<Command id="TwinTechs.EditorExtensions.Commands.NextMember"
+			_label="Next Member"
+			_description="Goes to the next member in a code file"
 			shortcut="Ctrl|Down"
 			macShortcut="Ctrl|Down"
-			defaultHandler="TwinTechs.EditorExtensions.NextMember" />
-		<Command id="TwinTechs.EditorExtensions.ToggleViewModel"
-			_label="Cycle VM/Xaml/.cs"
+			defaultHandler="TwinTechs.EditorExtensions.Commands.NextMember" />
+
+		<Command id="TwinTechs.EditorExtensions.Commands.CycleViewModelXamlCodeBehind"
+			_label="Cycle VM/Xaml/Code behind"
+			_description="Cycles between the vm and xaml file and code behind files"
+			shortcut="Shift|Meta|F8"
+			macShortcut="Shift|Meta|F8"
+			defaultHandler="TwinTechs.EditorExtensions.Commands.CycleViewModelXamlCodeBehind" />
+
+		<Command id="TwinTechs.EditorExtensions.Commands.ToggleViewModel"
+			_label="Cycle VM/Xaml"
 			_description="Cycles between the vm and xaml file"
 			shortcut="Shift|Meta|F9"
 			macShortcut="Shift|Meta|F9"
-			defaultHandler="TwinTechs.EditorExtensions.ToggleViewModel" />
-		<Command id="TwinTechs.EditorExtensions.ToggleViewModelPreferCodeBehind"
-			_label="Cycle VM/Xaml/.cs"
-			_description="Will cycle through the vm and code behind file"
+			defaultHandler="TwinTechs.EditorExtensions.Commands.ToggleViewModel" />
+
+		<Command id="TwinTechs.EditorExtensions.Commands.ToggleVMAndCodeBehind"
+			_label="Cycle VM/Code-behind"
+			_description="Will cycle through the VM and code-behind file"
 			shortcut="Shift|Meta|F10"
 			macShortcut="Shift|Meta|F10"
-			defaultHandler="TwinTechs.EditorExtensions.ToggleViewModelPreferCodeBehind" />
-		<Command id="TwinTechs.EditorExtensions.BrowseRecentDocument"
-			_label="Browse Recent Documents"
-			_description="Browse Recent Documents"
-			shortcut="Shift|Meta|E"
-			macShortcut="Shift|Meta|E"
-			defaultHandler="TwinTechs.EditorExtensions.ShowRecentDocumentBrowser" />
+			defaultHandler="TwinTechs.EditorExtensions.Commands.ToggleVMAndCodeBehind" />
+
+		<Command id="TwinTechs.EditorExtensions.Commands.ToggleUnitTestAndImplementation"
+			_label="Toggle Unit Tests"
+			_description="Will toggle the Unit test and implementation file"
+			shortcut="Alt|Meta|t"
+			macShortcut="Alt|Meta|t"
+			defaultHandler="TwinTechs.EditorExtensions.Commands.ToggleUnitTestAndImplementation" />
+
+		<Command id="TwinTechs.EditorExtensions.Commands.CreateUnitTestForMethod"
+			_label="Generate Unit Test"
+			_description="Create unit test for current method"
+			shortcut="Shift|Alt|Meta|t"
+			macShortcut="Shift|Alt|Meta|t"
+			defaultHandler="TwinTechs.EditorExtensions.Commands.CreateUnitTestForMethod" />
+
+		<Command id="TwinTechs.EditorExtensions.Commands.FixNamespace"
+			_label="Fix Namespace"
+			_description="Sets namespace to match file location"
+			shortcut="Alt|Meta|n"
+			macShortcut="Alt|Meta|n"
+			defaultHandler="TwinTechs.EditorExtensions.Commands.FixNamespace" />
 	</Extension>
 
 	<Extension path="/MonoDevelop/Ide/MainMenu/Search">
-		<CommandItem id="TwinTechs.EditorExtensions.ShowMembers" />
-		<CommandItem id="TwinTechs.EditorExtensions.PreviousMember" />
-		<CommandItem id="TwinTechs.EditorExtensions.NextMember" />
-		<CommandItem id="TwinTechs.EditorExtensions.ToggleViewModel" />
-		<CommandItem id="TwinTechs.EditorExtensions.ToggleViewModelPreferCodeBehind" />
-		<CommandItem id="TwinTechs.EditorExtensions.BrowseRecentDocument" />
+
+		<SeparatorItem id="TwinAddinsSeparator1" />
+
+		<CommandItem id="TwinTechs.EditorExtensions.Commands.GoToDeclarationPlus" />
+
+		<CommandItem id="TwinTechs.EditorExtensions.Commands.BrowseRecentDocument" />
+
+		<SeparatorItem id="TwinAddinsSeparator2" />
+
+		<CommandItem id="TwinTechs.EditorExtensions.Commands.ShowMembers" />
+
+		<CommandItem id="TwinTechs.EditorExtensions.Commands.PreviousMember" />
+
+		<CommandItem id="TwinTechs.EditorExtensions.Commands.NextMember" />
+
+		<SeparatorItem id="TwinAddinsSeparator3" />
+
+		<CommandItem id="TwinTechs.EditorExtensions.Commands.CycleViewModelXamlCodeBehind" />
+
+		<CommandItem id="TwinTechs.EditorExtensions.Commands.ToggleViewModel" />
+
+		<CommandItem id="TwinTechs.EditorExtensions.Commands.ToggleVMAndCodeBehind" />
+
+		<SeparatorItem id="TwinAddinsSeparator3" />
+
+		<CommandItem id="TwinTechs.EditorExtensions.Commands.ToggleUnitTestAndImplementation" />
+		<!-- TODO MOVE ME -->
+
+		<SeparatorItem id="TwinAddinsSeparator3" />
+
+		<CommandItem id="TwinTechs.EditorExtensions.Commands.CreateUnitTestForMethod" />
+
+		<CommandItem id="TwinTechs.EditorExtensions.Commands.FixNamespace" />
 	</Extension>
 </ExtensionModel>

@@ -198,6 +198,8 @@ namespace TwinTechs.EditorExtensions.Commands
 				}
 
 				var memberReference = new MemberReference (result, result.Region, num, result.Name.Length);
+				_foundMemberReferences.Add (memberReference);
+
 				if (!_didFindFirstResult) {
 					_didFindFirstResult = true;
 					_currentMemberReference = memberReference;
@@ -205,7 +207,6 @@ namespace TwinTechs.EditorExtensions.Commands
 				} else {
 					StatusHelper.ShowStatus (MonoDevelop.Ide.Gui.Stock.OpenFileIcon, GetStatusText ());
 				}
-				_foundMemberReferences.Add (memberReference);
 
 			}
 		}

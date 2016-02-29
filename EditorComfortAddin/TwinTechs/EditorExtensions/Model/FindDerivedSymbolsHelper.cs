@@ -20,11 +20,8 @@ namespace TwinTechs.EditorExtensions.Model
 {
 	public class FindDerivedSymbolsHelper : CommandHandler
 	{
-		static Func<Project, ICompilation> _lookupFuncion;
+		static Func<Project, ICompilation> _lookupFunction;
 
-		static MemberReference _currentMemberReference;
-		static List<MemberReference> _foundMemberReferences;
-		static bool _didFindFirstResult;
 
 		#region public api
 
@@ -32,32 +29,18 @@ namespace TwinTechs.EditorExtensions.Model
 		//
 		// Static Methods
 		//
-		public static void FindDerivedClasses (ITypeDefinition cls)
+		public static void FindDerivedClasses (ITypeDefinition cls, Action<ISearchProgressMonitor, IEntity> reportFunction)
 		{
-			ResetResults ();
-			_didFindFirstResult = false;
-			FindDerivedSymbolsHelper.FindDerivedSymbols (cls, null);
+			FindDerivedSymbolsHelper.FindDerivedSymbols (cls, null, reportFunction);
 		}
 
 
-		public static void CycleResults ()
+
+		public static void FindDerivedMembers (IMember member, Action<ISearchProgressMonitor, IEntity> reportFunction)
 		{
-			if (_foundMemberReferences.Count > 1) {
-				var currentIndex = _foundMemberReferences.IndexOf (_currentMemberReference);
-				currentIndex = currentIndex == _foundMemberReferences.Count - 1 ? 0 : currentIndex + 1;
-				_currentMemberReference = _foundMemberReferences [currentIndex];
-				NavigateToCurrentDocument ();
-			}
-		}
-
-
-		public static void FindDerivedMembers (IMember member)
-		{
-			ResetResults ();
-
 			ITypeDefinition declaringTypeDefinition = member.DeclaringTypeDefinition;
 			if (declaringTypeDefinition != null) {
-				FindDerivedSymbolsHelper.FindDerivedSymbols (declaringTypeDefinition, member);
+				FindDerivedSymbolsHelper.FindDerivedSymbols (declaringTypeDefinition, member, reportFunction);
 			}
 		}
 
@@ -75,22 +58,22 @@ namespace TwinTechs.EditorExtensions.Model
 			return result;
 		}
 
-		private static void FindDerivedSymbols (ITypeDefinition cls, IMember member)
+		private static void FindDerivedSymbols (ITypeDefinition cls, IMember member, Action<ISearchProgressMonitor, IEntity> reportFunction)
 		{
 			Solution currentSelectedSolution = IdeApp.ProjectOperations.CurrentSelectedSolution;
 			if (currentSelectedSolution != null) {
 				Project project = TypeSystemService.GetProject (cls);
 				if (project != null) {
 					IEnumerable<Project> referencingProjects = ReferenceFinder.GetAllReferencingProjects (currentSelectedSolution, project);
-					if (FindDerivedSymbolsHelper._lookupFuncion == null) {
-						FindDerivedSymbolsHelper._lookupFuncion = new Func<Project, ICompilation> (TypeSystemService.GetCompilation);
+					if (FindDerivedSymbolsHelper._lookupFunction == null) {
+						FindDerivedSymbolsHelper._lookupFunction = new Func<Project, ICompilation> (TypeSystemService.GetCompilation);
 					}
-					List<ICompilation> list = (from c in referencingProjects.Select (FindDerivedSymbolsHelper._lookupFuncion)
+					List<ICompilation> list = (from c in referencingProjects.Select (FindDerivedSymbolsHelper._lookupFunction)
 					                           where c != null
 					                           select c).ToList<ICompilation> ();
 					Parallel.ForEach<ICompilation> (list, delegate (ICompilation comp) {
 						try {
-							FindDerivedSymbolsHelper.SearchCompilation (null, comp, cls, member);
+							FindDerivedSymbolsHelper.SearchCompilation (null, comp, cls, member, reportFunction);
 						} catch (Exception ex) {
 							LoggingService.LogInternalError (ex);
 						}
@@ -99,35 +82,7 @@ namespace TwinTechs.EditorExtensions.Model
 			}
 		}
 
-		private static void ReportResult (ISearchProgressMonitor monitor, IEntity result)
-		{
-			string fileName = result.Region.FileName;
-			if (!string.IsNullOrEmpty (fileName)) {
-				TextEditorData textEditorData = TextFileProvider.Instance.GetTextEditorData (fileName);
-				int num = textEditorData.LocationToOffset (result.Region.Begin);
-				textEditorData.SearchRequest.SearchPattern = result.Name;
-				Mono.TextEditor.SearchResult searchResult = textEditorData.SearchForward (num);
-				if (searchResult != null) {
-					num = searchResult.Offset;
-				}
-				if (textEditorData.Parent == null) {
-					textEditorData.Dispose ();
-				}
-
-				var memberReference = new MemberReference (result, result.Region, num, result.Name.Length);
-				if (!_didFindFirstResult) {
-					_didFindFirstResult = true;
-					_currentMemberReference = memberReference;
-					NavigateToCurrentDocument ();
-				} else {
-					StatusHelper.ShowStatus (MonoDevelop.Ide.Gui.Stock.OpenFileIcon, GetStatusText ());
-				}
-				_foundMemberReferences.Add (memberReference);
-
-			}
-		}
-
-		private static void SearchCompilation (ISearchProgressMonitor monitor, ICompilation comp, ITypeDefinition cls, IMember member)
+		private static void SearchCompilation (ISearchProgressMonitor monitor, ICompilation comp, ITypeDefinition cls, IMember member, Action<ISearchProgressMonitor, IEntity> reportFunction)
 		{
 			ITypeDefinition typeDefinition = TypeSystemExtensions.Import (comp, cls);
 			if (typeDefinition != null) {
@@ -150,101 +105,33 @@ namespace TwinTechs.EditorExtensions.Model
 							entity = current;
 						}
 						//at this point we can jump to the first one
-						FindDerivedSymbolsHelper.ReportResult (monitor, entity);
+						reportFunction (monitor, entity);
 					}
 				}
 			}
 		}
 
-		//
-		// Methods
-		//
-		protected override void Run (object data)
-		{
-			Document activeDocument = IdeApp.Workbench.ActiveDocument;
-			if (activeDocument != null && !(activeDocument.FileName == FilePath.Null)) {
-				ResolveResult resolveResult;
-				object item = CurrentRefactoryOperationsHandler.GetItem (activeDocument, out resolveResult);
-				ITypeDefinition typeDefinition = item as ITypeDefinition;
-				if (typeDefinition != null && ((typeDefinition.Kind == TypeKind.Class && !typeDefinition.IsSealed) || typeDefinition.Kind == TypeKind.Interface)) {
-					FindDerivedSymbolsHelper.FindDerivedClasses (typeDefinition);
-				} else {
-					IMember member = item as IMember;
-					var symbolsHandler = new FindDerivedSymbolsHandler (member);
-					if (symbolsHandler.IsValid) {
-						symbolsHandler.Run ();
-					}
-				}
-			}
-		}
+		//		protected override void Run (object data)
+		//		{
+		//			Document activeDocument = IdeApp.Workbench.ActiveDocument;
+		//			if (activeDocument != null && !(activeDocument.FileName == FilePath.Null)) {
+		//				ResolveResult resolveResult;
+		//				object item = CurrentRefactoryOperationsHandler.GetItem (activeDocument, out resolveResult);
+		//				ITypeDefinition typeDefinition = item as ITypeDefinition;
+		//				if (typeDefinition != null && ((typeDefinition.Kind == TypeKind.Class && !typeDefinition.IsSealed) || typeDefinition.Kind == TypeKind.Interface)) {
+		//					FindDerivedSymbolsHelper.FindDerivedClasses (typeDefinition);
+		//				} else {
+		//					IMember member = item as IMember;
+		//					var symbolsHandler = new FindDerivedSymbolsHandler (member);
+		//					if (symbolsHandler.IsValid) {
+		//						symbolsHandler.Run ();
+		//					}
+		//				}
+		//			}
+		//		}
 
 
-		static void ResetResults ()
-		{
-			_currentMemberReference = null;
-			_foundMemberReferences = new List<MemberReference> ();
-			_didFindFirstResult = false;
-		}
-
-		static void NavigateToCurrentDocument ()
-		{
-			Gtk.Application.Invoke (delegate {
-				IdeApp.Workbench.OpenDocument (_currentMemberReference.FileName, null, _currentMemberReference.Region.BeginLine, _currentMemberReference.Region.BeginColumn, OpenDocumentOptions.Default);
-			});
-			StatusHelper.ShowStatus (MonoDevelop.Ide.Gui.Stock.OpenFileIcon, GetStatusText ());
-		}
-
-		static string GetStatusText ()
-		{
-			var message = GetNameWithoutLastBit (_currentMemberReference.FileName);
-			if (_foundMemberReferences?.Count > 1) {
-				var currentIndex = _foundMemberReferences.IndexOf (_currentMemberReference);
-				message += "(" + (currentIndex + 1) + "/" + _foundMemberReferences.Count + ")";
-			}
-			return message;
-		}
-
-		static string GetNameWithoutLastBit (string name)
-		{
-			int lastDotPosition = name.LastIndexOf (".");
-			if (lastDotPosition >= 0) {
-				name = name.Substring (0, lastDotPosition);
-			}
-			return name;
-		}
-	}
-
-	internal class FindDerivedSymbolsHandler
-	{
-		//
-		// Fields
-		//
-		private readonly IMember member;
-
-		//
-		// Properties
-		//
-		public bool IsValid {
-			get {
-				return IdeApp.ProjectOperations.CurrentSelectedSolution != null && TypeSystemService.GetProject (this.member) != null && (this.member.IsVirtual || this.member.IsAbstract || this.member.DeclaringType.Kind == TypeKind.Interface);
-			}
-		}
-
-		//
-		// Constructors
-		//
-		public FindDerivedSymbolsHandler (IMember member)
-		{
-			this.member = member;
-		}
-
-		//
-		// Methods
-		//
-		public void Run ()
-		{
-			FindDerivedClassesHandler.FindDerivedMembers (this.member);
-		}
+	
 	}
 }
 

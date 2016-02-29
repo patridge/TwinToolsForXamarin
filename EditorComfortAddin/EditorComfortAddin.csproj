@@ -59,8 +59,6 @@
     <Compile Include="TwinTechs\EditorExtensions\Helpers\RootWorkspaceExtensions.cs" />
     <Compile Include="TwinTechs\EditorExtensions\Extensions\IEnumerableExtensions.cs" />
     <Compile Include="TwinTechs\EditorExtensions\Helpers\NavigationHelper.cs" />
-    <Compile Include="TwinTechs\EditorExtensions\Model\SearchCollector.cs" />
-    <Compile Include="TwinTechs\EditorExtensions\Model\FindDerivedSymbolsHelper.cs" />
     <Compile Include="TwinTechs\EditorExtensions\Helpers\StatusHelper.cs" />
     <Compile Include="TwinTechs\EditorExtensions\Helpers\ViewModelHelper.cs" />
     <Compile Include="TwinTechs\EditorExtensions\Commands\CycleViewModelXamlCodeBehind.cs" />
@@ -73,6 +71,7 @@
     <Compile Include="TwinTechs\EditorExtensions\Commands\CreateUnitTestForMethod.cs" />
     <Compile Include="TwinTechs\EditorExtensions\Commands\FixNamespace.cs" />
     <Compile Include="TwinTechs\EditorExtensions\Helpers\DocumentHelper.cs" />
+    <Compile Include="TwinTechs\EditorExtensions\Model\FindDerivedSymbolsHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Manifest.addin.xml" />

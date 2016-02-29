@@ -108,6 +108,20 @@ namespace TwinTechs.EditorExtensions.Helpers
 			}
 		}
 
+		public IMember GetMemberWithName (string memberName)
+		{
+			var editor = IdeApp.Workbench.ActiveDocument.Editor;
+			var entities = GetEntities ();
+			foreach (var entity in entities) {
+				if (entity.Name.EndsWith (memberName)) {
+					return entity as IMember;
+				}
+			}
+			return null;
+		}
+
+
+
 		/// <summary>
 		/// Gets the entity at caret.
 		/// </summary>

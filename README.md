@@ -4,6 +4,15 @@ At [Twin Tecnologies](https://www.twintechs.com/) we pride ourselves on craftsma
 
 As such, I've been putting together features into a personal addin over the past year, which we're now making available to the community as an open source project. You can view the source and raise bugs/pull requests [here](https://github.com/georgejecook/EditorComfortAddin)
 
+##Installation
+
+  1. Open add-in manager
+  2. Select Gallery, click Manage repositories
+  3. Enter url http://www.tantawowa.com/twintools/repo/
+  4. Select repository "All repositories" from the gallery, select Twin Tools and and click install.
+  
+  ![image](img/installInstruction.gif)
+
 ##Features
 The addin provides the following features:
 

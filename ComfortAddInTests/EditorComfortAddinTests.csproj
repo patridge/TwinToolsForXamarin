@@ -10,6 +10,7 @@
     <RootNamespace>ComfortAddInTests</RootNamespace>
     <AssemblyName>ComfortAddInTests</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <ReleaseVersion>1.2</ReleaseVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -39,6 +40,7 @@
     <Compile Include="TwinTechs\EditorExtensions\Helpers\ViewModelHelperTests.cs" />
     <Compile Include="TwinTechs\EditorExtensions\Helpers\XamlHelperTests.cs" />
     <Compile Include="TwinTechs\EditorExtensions\Helpers\UnitTestHelperTests.cs" />
+    <Compile Include="TwinTechs\EditorExtensions\Helpers\DocumentHelperTests.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

@@ -16,6 +16,14 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using Mono.TextEditor;
 using System.Collections.Generic;
+using System.IO;
+using System.Xml;
+using ICSharpCode.NRefactory.CSharp.Resolver;
+using ICSharpCode.NRefactory.CSharp.Refactoring;
+using MonoDevelop.Projects;
+using MonoDevelop.Ide.TypeSystem;
+using System.Threading.Tasks;
+using MonoDevelop.Components.MainToolbar;
 
 [assembly: InternalsVisibleTo ("ComfortAddInTests")]
 namespace TwinTechs.EditorExtensions.Commands
@@ -99,30 +107,57 @@ namespace TwinTechs.EditorExtensions.Commands
 		void NavigateToXamlValue (AbstractResolvedEntity entity)
 		{
 			var editor = IdeApp.Workbench.ActiveDocument.Editor;
-			var tabSize = editor.Options.TabSize;
-
+			//first try to go to the element
 			//get text at caret, and expand out till we get soem quotes
 			var line = IdeApp.Workbench.ActiveDocument.Editor.Caret.Line;
 			var column = IdeApp.Workbench.ActiveDocument.Editor.Caret.Column;
 			var text = IdeApp.Workbench.ActiveDocument.Editor.GetLineText (line);
+
+			var member = MemberExtensionsHelper.Instance.GetNearestEntity (false, true);
+			//TODO get the exact property
+			//var memberText = editor.GetTextBetween (member.Region.Begin, member.Region.End);
+
+			//try to work out what this is..
+//			var didPass = XamlHelper.PerformXamlNavigationActionUsingText (editor.Text);
+			var isPropertyValue = XamlHelper.GetIsPropertyValue (text, column);
 			var valueText = XamlHelper.GetWordAtColumn (text, column);
-			if (!string.IsNullOrEmpty (valueText)) {
-				//crude mechanism for now to work out if this is a binding statemnet or not
-				string fileName = null;
-				if (text.Contains ("{")) {
-					//consider that it's a property on the vm
-					//TODO make more robust.. check before opening
-					fileName = ViewModelHelper.Instance.VMFileNameForActiveDocument;
-				} else {
-					//consider that it's a handler on the code behind
-					//TODO make more robust.. check before opening
-					fileName = ViewModelHelper.Instance.CodeBehindFileNameForActiveDocument;
+			if (isPropertyValue) {
+				if (!string.IsNullOrEmpty (valueText)) {
+					//crude mechanism for now to work out if this is a binding statemnet or not
+					string fileName = null;
+					if (text.Contains ("{")) {
+						//consider that it's a property on the vm
+						//TODO make more robust.. check before opening
+						fileName = ViewModelHelper.Instance.VMFileNameForActiveDocument;
+					} else {
+						//consider that it's a handler on the code behind
+						//TODO make more robust.. check before opening
+						fileName = ViewModelHelper.Instance.CodeBehindFileNameForActiveDocument;
+					}
+					ViewModelHelper.Instance.OpenDocument (fileName);
+					//now go to the member
+					MemberExtensionsHelper.Instance.GotoMemberWithName (valueText);
 				}
-				ViewModelHelper.Instance.OpenDocument (fileName);
-				//now go to the member
-				MemberExtensionsHelper.Instance.GotoMemberWithName (valueText);
+			} else {
+				var unresolvedMember = member as AbstractUnresolvedMember;
+
+				if (unresolvedMember?.ReturnType != null) {
+					var returnType = unresolvedMember.ReturnType as GetClassTypeReference;
+					var fileNameString = returnType.FullTypeName.ReflectionName.Replace (".", "/");
+					Project targetProject;
+					var fileName = DocumentHelper.GetFileNameWithType (fileNameString, out targetProject);
+
+					if (fileName != null) {
+						IdeHelper.OpenDocument (fileName, targetProject);
+						if (!string.IsNullOrEmpty (valueText)) {
+							MemberExtensionsHelper.Instance.GotoMemberWithName (valueText);
+						}
+					}
+				}
+	
 			}
 		}
+
 
 		#region methods related to handling interface method cycling
 

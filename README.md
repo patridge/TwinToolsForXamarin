@@ -2,7 +2,7 @@
 ##Overview
 At [Twin Tecnologies](https://www.twintechs.com/) we pride ourselves on craftsmanship and efficiency. We think Xamarin Studio is great; but there's a few gaps in the navigation/tooling which stops us from being as productive as when we use Jetbrains ides/ Resharper.
 
-As such, I've been putting together features into a personal addin over the past year, which we're now making available to the community as an open source project. You can view the source and raise bugs/pull requests [here](https://github.com/georgejecook/EditorComfortAddin)
+As such, I've been putting together features into a personal addin over the past year, which we're now making available to the community as an open source project. You can view the source and raise bugs/pull requests [here](https://github.com/georgejecook/TwinToolsForXamarin)
 
 ##Installation
 

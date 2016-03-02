@@ -1,4 +1,4 @@
-# Twin Tools Addin for Xamarin Studio
+# Twin Tools Add-in for Xamarin Studio
 
 ## Overview
 
@@ -8,7 +8,7 @@ As such, I've been putting together features into a personal add-in over the pas
 
 ## Installation
 
-  1. Open add-in manager
+  1. Open Add-in Manager
   2. Select Gallery, click Manage repositories
   3. Enter url http://www.tantawowa.com/twintools/repo/
   4. Select repository "All repositories" from the gallery, select Twin Tools and and click install.
@@ -16,7 +16,8 @@ As such, I've been putting together features into a personal add-in over the pas
   ![image](img/installInstruction.gif)
 
 ## Features
-The addin provides the following features:
+
+The add-in provides the following features:
 
   * List class members via hotkey (ordered by document location, works in XAML too)
   * Filter and jump straight to a class member
@@ -24,7 +25,7 @@ The addin provides the following features:
   * Filterable recent file history (only search for documents you're actively working on)
   * Toggle XAML/Code-behind/ViewModel files
   * Automatically fix namespace to match current folder location (plus experimental refactoring to update all references)
-  * Go To Definition+, an improved goto definition implementation that can:
+  * Go To Definition+, an improved Go To Declaration implementation that can:
     * Go to actual member implementations, if the cursor is on an interface type
     * Cycle between multiple classes, if there are multiple implementors of an interface member
     * Go to a method/property on your view model from a XAML file
@@ -43,7 +44,7 @@ You will find an overview video here : [https://www.youtube.com/watch?v=_sYSDFR0
 ### Toggling ViewModel/XAML
 
   * If your XAML file is called `View.xaml` then the View model _must_ be named `ViewVM.cs` or `ViewViewModel.cs`
-  * The files can all be in the same folder, or you can have the xaml in a `View` folder, and the VM's in a `ViewModel` folder
+  * The files can all be in the same folder, or you can have the XAML in a `View` folder, and the VM's in a `ViewModel` folder
   
 ### Go to unit test
 

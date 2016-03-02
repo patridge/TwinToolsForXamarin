@@ -5,7 +5,7 @@ using Mono.Addins.Description;
 [assembly:Addin (
 	"Twin Tools", 
 	Namespace = "TwinTechs.EditorExtensions",
-	Version = "1.1"
+	Version = "1.2"
 )]
 
 [assembly:AddinName ("Twin Tools")]
@@ -15,3 +15,5 @@ using Mono.Addins.Description;
 
 [assembly:AddinDependency ("::MonoDevelop.Core", MonoDevelop.BuildInfo.Version)]
 [assembly:AddinDependency ("::MonoDevelop.Ide", MonoDevelop.BuildInfo.Version)]
+[assembly:AddinDependency ("::MonoDevelop.Refactoring", MonoDevelop.BuildInfo.Version)]
+

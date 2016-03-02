@@ -1,8 +1,17 @@
 #Twin Tools Addin for Xamarin Studio
 ##Overview
-At [Twin Tecnologies](https://www.twintechs.com/) we pride ourselveso on craftsmanship and efficiency. We think Xamarin Studio is great; but there's a few gaps in the navigation/tooling which stops us from being as productive as when we use Jetbrains ides/ Resharper.
+At [Twin Tecnologies](https://www.twintechs.com/) we pride ourselves on craftsmanship and efficiency. We think Xamarin Studio is great; but there's a few gaps in the navigation/tooling which stops us from being as productive as when we use Jetbrains ides/ Resharper.
 
-As such, I've been putting together features into a personal addin over the past year, which we're now makign available to the community as an open source project. You can view the source and raise bugs/pull requests [here](https://github.com/georgejecook/EditorComfortAddin)
+As such, I've been putting together features into a personal addin over the past year, which we're now making available to the community as an open source project. You can view the source and raise bugs/pull requests [here](https://github.com/georgejecook/TwinToolsForXamarin)
+
+##Installation
+
+  1. Open add-in manager
+  2. Select Gallery, click Manage repositories
+  3. Enter url http://www.tantawowa.com/twintools/repo/
+  4. Select repository "All repositories" from the gallery, select Twin Tools and and click install.
+  
+  ![image](img/installInstruction.gif)
 
 ##Features
 The addin provides the following features:
@@ -13,9 +22,9 @@ The addin provides the following features:
   * Filterable recent file history (only search for documents you're actively working on)
   * Toggle Xaml/Code behind/ViewModel files
   * Automatically fix namespace to match current folder location (plus experimental refactoring to update all references)
-  * Go To Definition+, an improved goto definition implemnetation that can:
-    * Go to actual member implementaitons, if the cursor is on an interface type
-    * Cycle between multiple classes, if there are multipel implementors of an interface member
+  * Go To Definition+, an improved goto definition implementation that can:
+    * Go to actual member implementations, if the cursor is on an interface type
+    * Cycle between multiple classes, if there are multiple implementors of an interface member
     * Go to a method/property on your view model from a xaml file
     * Go to an event handler in your code behind file, from a xaml file
   * Toggle class/Unit test file, and go to correct method in each
@@ -34,15 +43,15 @@ Please check the default hotkeys and be prepared to reconfigure, as they are cur
 
   * If your project is called `MyProject` then your test project must be called `MyProjectTests`
   * Your unit test project must be in the implementation project's solution
-  * It is expected that your unit test project uses the same namespacing as your implementaiton project.
+  * It is expected that your unit test project uses the same namespacing as your implementation project.
   * If a method is named `SomeMethod` then your tests must be called `TestSomeMethod` or `Test_SomeMethod`
   * you can have multiple methods, and add more stuff to the end of the name i.e. `Test_SomeMethod_InvalidEntryScenarios`
-  * geneated methods are named `MethodName_Test`
+  * generated methods are named `MethodName_Test`
   
 ##WIP features
 ### Fix namespace
   * The feature is currently experimental
-  * It is not yet implemented as a hotfix
-  * It will update the namespace to the _correct_ namespace for the files location in the source code folder. You cannot change the namespace arbirtarily
+  * It is not yet implemented as a hot-fix
+  * It will update the namespace to the _correct_ namespace for the files location in the source code folder. You cannot change the namespace arbitrarily
   * Refactoring other files is experimental. You'd be best served to commit your work before trying. Don't worry, it will ask you if you want to do that before it goes doing crazy stuff
   * this feature is WIP

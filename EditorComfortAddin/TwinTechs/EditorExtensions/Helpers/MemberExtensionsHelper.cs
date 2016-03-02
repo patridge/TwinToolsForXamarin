@@ -148,7 +148,7 @@ namespace TwinTechs.EditorExtensions.Helpers
 		/// </summary>
 		/// <returns>The nearest entity.</returns>
 		/// <param name="isDirectionDown">If set to <c>true</c> is direction down.</param>
-		public IUnresolvedEntity GetNearestEntity (bool isDirectionDown)
+		public IUnresolvedEntity GetNearestEntity (bool isDirectionDown, bool includeItemOnLine = false)
 		{
 			IUnresolvedEntity returnEntity;
 			var editor = IdeApp.Workbench.ActiveDocument.Editor;
@@ -159,7 +159,9 @@ namespace TwinTechs.EditorExtensions.Helpers
 
 			while (enumerator.MoveNext ()) {
 				var currentEntity = enumerator.Current;
-				if (isDirectionDown) {
+				if ((includeItemOnLine && currentEntity.Region.BeginLine == lineNumber)) {
+					return currentEntity;
+				} else if (isDirectionDown) {
 					if (currentEntity.Region.BeginLine > lineNumber) {
 						return currentEntity;
 					}

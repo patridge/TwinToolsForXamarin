@@ -270,7 +270,6 @@ namespace TwinTechs.EditorExtensions.Helpers
 				IdeApp.ProjectOperations.Save (unitTestProject);
 				return true;
 			} catch (Exception ex) {
-				Console.WriteLine ("error creating unit test");
 				StatusHelper.ShowStatus (Stock.StatusError, "Couldn't create unit test file");
 				return false;
 			}

@@ -21,23 +21,26 @@ namespace TwinTechs.EditorExtensions.Helpers
 
 		const string PathDelimeter = "#:#";
 
-		static FileHistoryHelper ()
+		static FileHistoryHelper()
 		{
-			
-			Console.WriteLine ("creating file history helper " + Instance);
+
+			Console.WriteLine("creating file history helper " + Instance);
 		}
 
 
-		public static FileHistoryHelper Instance {
-			get {
-				if (_instance == null) {
-					_instance = new FileHistoryHelper ();
+		public static FileHistoryHelper Instance
+		{
+			get
+			{
+				if (_instance == null)
+				{
+					_instance = new FileHistoryHelper();
 				}
 				return _instance;
 			}
 		}
 
-		public FileHistoryHelper ()
+		public FileHistoryHelper()
 		{
 			IdeApp.Workbench.ActiveDocumentChanged += IdeApp_Workbench_ActiveDocumentChanged;
 			IdeApp.Workspace.SolutionLoaded += IdeApp_Workspace_SolutionChanged;
@@ -45,61 +48,72 @@ namespace TwinTechs.EditorExtensions.Helpers
 			IdeApp.Exiting += IdeApp_Exiting;
 		}
 
-		void IdeApp_Workspace_SolutionChanged (object sender, SolutionEventArgs e)
+		void IdeApp_Workspace_SolutionChanged(object sender, SolutionEventArgs e)
 		{
-			SaveHistory ();
+			SaveHistory();
 		}
 
 
-		void IdeApp_Exiting (object sender, ExitEventArgs args)
+		void IdeApp_Exiting(object sender, ExitEventArgs args)
 		{
-			SaveHistory ();
+			SaveHistory();
 		}
 
 		#region events
 
-		void IdeApp_Workbench_ActiveDocumentChanged (object sender, EventArgs e)
+		void IdeApp_Workbench_ActiveDocumentChanged(object sender, EventArgs e)
 		{
-			if (_previousDocument != null && _previousDocument.Editor != null && _previousDocument.Editor.Caret != null) {
-				UpdateFileOpenInfo (_previousDocument, _previousDocument.Editor.Caret.Line, _previousDocument.Editor.Caret.Column);
+			//TODO track this better in roslyn
+			if (_previousDocument != null && _previousDocument.Editor != null)
+			{
+				UpdateFileOpenInfo(_previousDocument, _previousDocument.Editor.CaretLine, _previousDocument.Editor.CaretColumn);
 			}
 
-			if (IdeApp.Workbench != null && IdeApp.Workbench.ActiveDocument != null) {
+			if (IdeApp.Workbench != null && IdeApp.Workbench.ActiveDocument != null)
+			{
 				var document = IdeApp.Workbench.ActiveDocument;
-				if (document != null && document.FileName != null) {
-					
-					var existingFileInfo = _recentDocuments.FirstOrDefault ((arg) => arg.Project.ItemId == document.Project.ItemId && arg.FileName.FullPath == document.FileName.FullPath);
+				if (document != null && document.FileName != null)
+				{
+
+					var existingFileInfo = _recentDocuments.FirstOrDefault((arg) => arg.Project.ItemId == document.Project.ItemId && arg.FileName.FullPath == document.FileName.FullPath);
 					var lineNumber = existingFileInfo?.Line ?? 1;
 					var column = existingFileInfo?.Column ?? 1;
-					UpdateFileOpenInfo (document, lineNumber, column);
+					UpdateFileOpenInfo(document, lineNumber, column);
 				}
 			}
 			_previousDocument = IdeApp.Workbench.ActiveDocument;
 
 			//TODO experimental - probably want to move this to ide save, or every 30 seconds or so..
-			SaveHistory ();
+			SaveHistory();
 		}
 
-		void UpdateFileOpenInfo (MonoDevelop.Ide.Gui.Document document, int line, int column)
+		void UpdateFileOpenInfo(MonoDevelop.Ide.Gui.Document document, int line, int column)
 		{
-			try {
-				
-				var existingFileInfo = _recentDocuments.FirstOrDefault ((arg) => arg.Project.ItemId == document.Project.ItemId && arg.FileName.FullPath == document.FileName.FullPath);
-				if (existingFileInfo != null) {
-					_recentDocuments.Remove (existingFileInfo);
+			try
+			{
+
+				var existingFileInfo = _recentDocuments.FirstOrDefault((arg) => arg.Project.ItemId == document.Project.ItemId && arg.FileName.FullPath == document.FileName.FullPath);
+				if (existingFileInfo != null)
+				{
+					_recentDocuments.Remove(existingFileInfo);
 				}
-				if (GetProjectWithId (document.Project.ItemId) != null && File.Exists (document.FileName.FullPath)) {
-					var fileInfo = new FileOpenInformation (document.FileName.FullPath, document.Project, line, column, OpenDocumentOptions.BringToFront | OpenDocumentOptions.TryToReuseViewer);
-					_recentDocuments.Insert (0, fileInfo);
+				if (GetProjectWithId(document.Project.ItemId) != null && File.Exists(document.FileName.FullPath))
+				{
+					var fileInfo = new FileOpenInformation(document.FileName.FullPath, document.Project, line, column, OpenDocumentOptions.BringToFront | OpenDocumentOptions.TryToReuseViewer);
+					_recentDocuments.Insert(0, fileInfo);
 				}
-				if (_recentDocuments.Count >= MaxDocuments) {
+				if (_recentDocuments.Count >= MaxDocuments)
+				{
 					var numberOfDocumentsToPurge = _recentDocuments.Count - MaxDocuments;
-					for (int i = 0; i < numberOfDocumentsToPurge; i++) {
-						_recentDocuments.RemoveAt (_recentDocuments.Count - 1);
+					for (int i = 0; i < numberOfDocumentsToPurge; i++)
+					{
+						_recentDocuments.RemoveAt(_recentDocuments.Count - 1);
 					}
 				}
-			} catch (Exception ex) {
-				Console.WriteLine ("error updating file info " + ex.Message);
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine("error updating file info " + ex.Message);
 			}
 
 		}
@@ -113,13 +127,14 @@ namespace TwinTechs.EditorExtensions.Helpers
 		/// Gets the recent documents.
 		/// </summary>
 		/// <returns>The recent documents.</returns>
-		public Collection<FileOpenInformation> GetRecentDocuments ()
+		public Collection<FileOpenInformation> GetRecentDocuments()
 		{
-			if (_loadedSolution == null || _loadedSolution != IdeApp.ProjectOperations.CurrentSelectedSolution) {
+			if (_loadedSolution == null || _loadedSolution != IdeApp.ProjectOperations.CurrentSelectedSolution)
+			{
 				_loadedSolution = IdeApp.ProjectOperations.CurrentSelectedSolution;
-				LoadHistory ();
+				LoadHistory();
 			}
-			return new Collection<FileOpenInformation> (_recentDocuments);
+			return new Collection<FileOpenInformation>(_recentDocuments);
 		}
 
 		#endregion
@@ -129,27 +144,33 @@ namespace TwinTechs.EditorExtensions.Helpers
 		/// <summary>
 		/// Loads the history.
 		/// </summary>
-		void LoadHistory ()
+		void LoadHistory()
 		{
-			var historyItems = new Collection<FileOpenInformation> ();
-			try {
-				var paths = File.ReadAllLines (GetSavedStatePath ());
-				var splitItems = paths.Select ((arg) => arg.Split (new string[] { PathDelimeter }, StringSplitOptions.None));
-				foreach (var item in splitItems) {
-					var project = GetProjectWithId (item [1]);
-					var line = int.Parse (item [2]);
-					var column = int.Parse (item [3]);
-					if (project != null && File.Exists (item [0])) {
-						var fileOpenInformation = new FileOpenInformation (item [0], project, line, column, OpenDocumentOptions.BringToFront | OpenDocumentOptions.TryToReuseViewer);
-						var isDupliate = historyItems.FirstOrDefault (info => info.Project.ItemId == project.ItemId &&
-						                 info.FileName == item [0]) != null;
-						if (!isDupliate && historyItems.Count < MaxDocuments) {
-							historyItems.Add (fileOpenInformation);
+			var historyItems = new Collection<FileOpenInformation>();
+			try
+			{
+				var paths = File.ReadAllLines(GetSavedStatePath());
+				var splitItems = paths.Select((arg) => arg.Split(new string[] { PathDelimeter }, StringSplitOptions.None));
+				foreach (var item in splitItems)
+				{
+					var project = GetProjectWithId(item[1]);
+					var line = int.Parse(item[2]);
+					var column = int.Parse(item[3]);
+					if (project != null && File.Exists(item[0]))
+					{
+						var fileOpenInformation = new FileOpenInformation(item[0], project, line, column, OpenDocumentOptions.BringToFront | OpenDocumentOptions.TryToReuseViewer);
+						var isDupliate = historyItems.FirstOrDefault(info => info.Project.ItemId == project.ItemId &&
+										info.FileName == item[0]) != null;
+						if (!isDupliate && historyItems.Count < MaxDocuments)
+						{
+							historyItems.Add(fileOpenInformation);
 						}
 					}
 				}
-			} catch (Exception e) {
-				Console.WriteLine ("error loading history " + e.Message);
+			}
+			catch (Exception e)
+			{
+				Console.WriteLine("error loading history " + e.Message);
 			}
 			_recentDocuments = historyItems;
 		}
@@ -158,19 +179,22 @@ namespace TwinTechs.EditorExtensions.Helpers
 		/// <summary>
 		/// Saves the history.
 		/// </summary>
-		void SaveHistory ()
+		void SaveHistory()
 		{
-			try {
-				var newItems = _recentDocuments.Select ((e) => new string[] {
+			try
+			{
+				var newItems = _recentDocuments.Select((e) => new string[] {
 					e.FileName.FullPath,
 					e.Project.ItemId,
 					e.Column.ToString (),
 					e.Line.ToString ()
-				}).Where (data => File.Exists (data [0]));
-				var concatanated = newItems.Select ((string[] arg) => string.Join (PathDelimeter, arg));
-				File.WriteAllLines (GetSavedStatePath (), concatanated);
-			} catch (Exception e) {
-				Console.WriteLine ("error saving history " + e.Message);
+				}).Where(data => File.Exists(data[0]));
+				var concatanated = newItems.Select((string[] arg) => string.Join(PathDelimeter, arg));
+				File.WriteAllLines(GetSavedStatePath(), concatanated);
+			}
+			catch (Exception e)
+			{
+				Console.WriteLine("error saving history " + e.Message);
 			}
 		}
 
@@ -179,25 +203,27 @@ namespace TwinTechs.EditorExtensions.Helpers
 		/// </summary>
 		/// <returns>The project with identifier.</returns>
 		/// <param name="itemId">Item identifier.</param>
-		Project GetProjectWithId (string itemId)
+		Project GetProjectWithId(string itemId)
 		{
-			return IdeApp.Workspace.GetAllProjects ().FirstOrDefault ((project) => project.ItemId == itemId);
+			return IdeApp.Workspace.GetAllProjects().FirstOrDefault((project) => project.ItemId == itemId);
 		}
 
 		/// <summary>
 		/// Saveds the state path.
 		/// </summary>
 		/// <returns>The state path.</returns>
-		string GetSavedStatePath ()
+		string GetSavedStatePath()
 		{
 			//TODO get a workspace specific base directory
-			if (_loadedSolution != null) {
-				var tempPath = _loadedSolution.BaseDirectory.Combine (".#FileHistory");
+			if (_loadedSolution != null)
+			{
+				var tempPath = _loadedSolution.BaseDirectory.Combine(".#FileHistory");
 				return tempPath;
-			} else {
+			}
+			else {
 				return null;
 			}
-				
+
 		}
 
 		#endregion

@@ -36,42 +36,42 @@ namespace TwinTechs.EditorExtensions.View
 
 		int _selectedIndex;
 
-		public RecentFileListWindow (string title, Gtk.Window parent, DialogFlags flags, params object[] button_data) : base (title, parent, flags, button_data)
+		public RecentFileListWindow(string title, Gtk.Window parent, DialogFlags flags, params object[] button_data) : base(title, parent, flags, button_data)
 		{
-			
-			_searchView = new Gtk.Entry ("");
-			_searchView.SetSizeRequest (500, 40);
+
+			_searchView = new Gtk.Entry("");
+			_searchView.SetSizeRequest(500, 40);
 			_searchView.Changed += _searchView_Changed;
 			_searchView.KeyReleaseEvent += HandleSearchViewKeyReleaseEvent;
 			_searchView.KeyPressEvent += HandleKeyPressEvent;
 			_searchView.FocusOutEvent += HandleFocusOutEvent;
-			VBox.Add (_searchView);
+			VBox.Add(_searchView);
 
-			CreateTree ();
-			_scrolledWindow = new Gtk.ScrolledWindow ();
-			_scrolledWindow.SetSizeRequest (500, 600);
-			_scrolledWindow.Add (_treeView);
-			VBox.Add (_scrolledWindow);
-			_pathLabel = new Gtk.Label ();
-			_pathLabel.SetSizeRequest (500, 40);
-			VBox.Add (_pathLabel);
+			CreateTree();
+			_scrolledWindow = new Gtk.ScrolledWindow();
+			_scrolledWindow.SetSizeRequest(500, 600);
+			_scrolledWindow.Add(_treeView);
+			VBox.Add(_scrolledWindow);
+			_pathLabel = new Gtk.Label();
+			_pathLabel.SetSizeRequest(500, 40);
+			VBox.Add(_pathLabel);
 
 			MemberExtensionsHelper.Instance.IsDirty = true;
-			UpdateDocuments ();
-			VBox.SetSizeRequest (500, 700);
-			this.SetSizeRequest (500, 700);
+			UpdateDocuments();
+			VBox.SetSizeRequest(500, 700);
+			this.SetSizeRequest(500, 700);
 
 			CanFocus = true;
 			_searchView.CanFocus = true;
 			_searchView.IsEditable = true;
-			_searchView.GrabFocus ();
-			ShowAll ();
+			_searchView.GrabFocus();
+			ShowAll();
 
 		}
 
 		#region key events
 
-		void HandleKeyPressEvent (object o, Gtk.KeyPressEventArgs args)
+		void HandleKeyPressEvent(object o, Gtk.KeyPressEventArgs args)
 		{
 			keyHandled = false;
 
@@ -80,179 +80,186 @@ namespace TwinTechs.EditorExtensions.View
 			var modifier = args.Event.State;
 			var key = args.Event.Key;
 
-			var processResult = PreProcessKey (key, keyChar, modifier);
-			if ((processResult & KeyActions.CloseWindow) != 0) {
-				CloseWindow ((processResult & KeyActions.Complete) != 0);
+			var processResult = PreProcessKey(key, keyChar, modifier);
+			if ((processResult & KeyActions.CloseWindow) != 0)
+			{
+				CloseWindow((processResult & KeyActions.Complete) != 0);
 			}
 			var handled = (processResult & KeyActions.Process) != 0;
 			handled = true;
 			args.RetVal = keyHandled = handled;
 		}
 
-		void HandleSearchViewKeyReleaseEvent (object o, Gtk.KeyReleaseEventArgs args)
+		void HandleSearchViewKeyReleaseEvent(object o, Gtk.KeyReleaseEventArgs args)
 		{
-			switch (args.Event.Key) {
-			case Gdk.Key.Return:
-			case Gdk.Key.ISO_Enter:
-			case Gdk.Key.Key_3270_Enter:
-			case Gdk.Key.KP_Enter:
-				CloseWindow (true);
-				break;
-			default:
-				break;
+			switch (args.Event.Key)
+			{
+				case Gdk.Key.Return:
+				case Gdk.Key.ISO_Enter:
+				case Gdk.Key.Key_3270_Enter:
+				case Gdk.Key.KP_Enter:
+					CloseWindow(true);
+					break;
+				default:
+					break;
 			}
 
 			args.RetVal = keyHandled = true;
 		}
 
-		void HandleKeyReleaseEvent (object o, Gtk.KeyReleaseEventArgs args)
+		void HandleKeyReleaseEvent(object o, Gtk.KeyReleaseEventArgs args)
 		{
 			args.RetVal = keyHandled = true;
 		}
 
-		void HandleFocusOutEvent (object o, FocusOutEventArgs args)
+		void HandleFocusOutEvent(object o, FocusOutEventArgs args)
 		{
-			_searchView.GrabFocus ();
+			_searchView.GrabFocus();
 		}
 
-		TreeIter GetTreeIterForRow (int index)
+		TreeIter GetTreeIterForRow(int index)
 		{
 			TreeIter iter;
 
-			_listStore.GetIter (out iter, new TreePath (new int[]{ index }));
+			_listStore.GetIter(out iter, new TreePath(new int[] { index }));
 			return iter;
 		}
 
-		public KeyActions PreProcessKey (Gdk.Key key, char keyChar, Gdk.ModifierType modifier)
+		public KeyActions PreProcessKey(Gdk.Key key, char keyChar, Gdk.ModifierType modifier)
 		{
 			bool isSelected;
 
-			switch (key) {
-			case Gdk.Key.Home:
-				if ((modifier & ModifierType.ShiftMask) == ModifierType.ShiftMask)
-					return KeyActions.Process;
-				//TODO
-				return KeyActions.Ignore;
-			case Gdk.Key.End:
-				if ((modifier & ModifierType.ShiftMask) == ModifierType.ShiftMask)
-					return KeyActions.Process;
-				//TODO
-				return KeyActions.Ignore;
+			switch (key)
+			{
+				case Gdk.Key.Home:
+					if ((modifier & ModifierType.ShiftMask) == ModifierType.ShiftMask)
+						return KeyActions.Process;
+					//TODO
+					return KeyActions.Ignore;
+				case Gdk.Key.End:
+					if ((modifier & ModifierType.ShiftMask) == ModifierType.ShiftMask)
+						return KeyActions.Process;
+					//TODO
+					return KeyActions.Ignore;
 
-			case Gdk.Key.Up:
-				if (_selectedIndex - 1 >= 0) {
-					SelectRowIndex (_selectedIndex - 1);
-				}
-				return KeyActions.Ignore;
+				case Gdk.Key.Up:
+					if (_selectedIndex - 1 >= 0)
+					{
+						SelectRowIndex(_selectedIndex - 1);
+					}
+					return KeyActions.Ignore;
 
-			case Gdk.Key.Tab:
-				//tab always completes current item even if selection is disabled
-				goto case Gdk.Key.Return;
-//
-			case Gdk.Key.Return:
-			case Gdk.Key.ISO_Enter:
-			case Gdk.Key.Key_3270_Enter:
-			case Gdk.Key.KP_Enter:
-				if (_selectedDocument != null) {
-					//MemberExtensionsHelper.Instance.GotoMember (_selectedDocument);
+				case Gdk.Key.Tab:
+					//tab always completes current item even if selection is disabled
+					goto case Gdk.Key.Return;
+				//
+				case Gdk.Key.Return:
+				case Gdk.Key.ISO_Enter:
+				case Gdk.Key.Key_3270_Enter:
+				case Gdk.Key.KP_Enter:
+					if (_selectedDocument != null)
+					{
+						//MemberExtensionsHelper.Instance.GotoMember (_selectedDocument);
+						return KeyActions.Complete | KeyActions.Ignore | KeyActions.CloseWindow;
+					}
+					return KeyActions.Ignore;
+				case Gdk.Key.Escape:
+					_selectedDocument = null;
 					return KeyActions.Complete | KeyActions.Ignore | KeyActions.CloseWindow;
-				}
-				return KeyActions.Ignore;
-			case Gdk.Key.Escape:
-				_selectedDocument = null;
-				return KeyActions.Complete | KeyActions.Ignore | KeyActions.CloseWindow;
-			case Gdk.Key.Down:
-				if (_selectedIndex + 1 < _filteredDocuments.Count) {
-					SelectRowIndex (_selectedIndex + 1);
-				}
-				return KeyActions.Ignore;
+				case Gdk.Key.Down:
+					if (_selectedIndex + 1 < _filteredDocuments.Count)
+					{
+						SelectRowIndex(_selectedIndex + 1);
+					}
+					return KeyActions.Ignore;
 
-			case Gdk.Key.Page_Up:
-				if ((modifier & ModifierType.ShiftMask) == ModifierType.ShiftMask)
+				case Gdk.Key.Page_Up:
+					if ((modifier & ModifierType.ShiftMask) == ModifierType.ShiftMask)
+						return KeyActions.Process;
+					//TODO
+					return KeyActions.Ignore;
+
+				case Gdk.Key.Page_Down:
+					if ((modifier & ModifierType.ShiftMask) == ModifierType.ShiftMask)
+						return KeyActions.Process;
+					//TODO
+					return KeyActions.Ignore;
+
+				case Gdk.Key.Left:
+					//if (curPos == 0) return KeyActions.CloseWindow | KeyActions.Process;
+					//curPos--;
 					return KeyActions.Process;
-				//TODO
-				return KeyActions.Ignore;
 
-			case Gdk.Key.Page_Down:
-				if ((modifier & ModifierType.ShiftMask) == ModifierType.ShiftMask)
+				case Gdk.Key.Right:
+					//if (curPos == word.Length) return KeyActions.CloseWindow | KeyActions.Process;
+					//curPos++;
 					return KeyActions.Process;
-				//TODO
-				return KeyActions.Ignore;
 
-			case Gdk.Key.Left:
-				//if (curPos == 0) return KeyActions.CloseWindow | KeyActions.Process;
-				//curPos--;
-				return KeyActions.Process;
+				case Gdk.Key.Caps_Lock:
+				case Gdk.Key.Num_Lock:
+				case Gdk.Key.Scroll_Lock:
+					return KeyActions.Ignore;
 
-			case Gdk.Key.Right:
-				//if (curPos == word.Length) return KeyActions.CloseWindow | KeyActions.Process;
-				//curPos++;
-				return KeyActions.Process;
-
-			case Gdk.Key.Caps_Lock:
-			case Gdk.Key.Num_Lock:
-			case Gdk.Key.Scroll_Lock:
-				return KeyActions.Ignore;
-
-			case Gdk.Key.Control_L:
-			case Gdk.Key.Control_R:
-			case Gdk.Key.Alt_L:
-			case Gdk.Key.Alt_R:
-			case Gdk.Key.Shift_L:
-			case Gdk.Key.Shift_R:
-			case Gdk.Key.ISO_Level3_Shift:
-				// AltGr
-				return KeyActions.Process;
-			default:
-				return KeyActions.Ignore;
+				case Gdk.Key.Control_L:
+				case Gdk.Key.Control_R:
+				case Gdk.Key.Alt_L:
+				case Gdk.Key.Alt_R:
+				case Gdk.Key.Shift_L:
+				case Gdk.Key.Shift_R:
+				case Gdk.Key.ISO_Level3_Shift:
+					// AltGr
+					return KeyActions.Process;
+				default:
+					return KeyActions.Ignore;
 			}
-			if (keyChar == '\0')
-				return KeyActions.Process;
+			//if (keyChar == '\0')
+			//	return KeyActions.Process;
 
-			if (keyChar == ' ' && (modifier & ModifierType.ShiftMask) == ModifierType.ShiftMask)
-				return KeyActions.CloseWindow | KeyActions.Process;
+			//if (keyChar == ' ' && (modifier & ModifierType.ShiftMask) == ModifierType.ShiftMask)
+			//	return KeyActions.CloseWindow | KeyActions.Process;
 
-			// special case end with punctuation like 'param:' -> don't input double punctuation, otherwise we would end up with 'param::'
-			if (char.IsPunctuation (keyChar) && keyChar != '_') {
-				return KeyActions.Ignore;
-			}
-			return KeyActions.Process;
+			//// special case end with punctuation like 'param:' -> don't input double punctuation, otherwise we would end up with 'param::'
+			//if (char.IsPunctuation(keyChar) && keyChar != '_')
+			//{
+			//	return KeyActions.Ignore;
+			//}
+			//return KeyActions.Process;
 		}
 
 
 
-		void _searchView_Changed (object sender, EventArgs e)
+		void _searchView_Changed(object sender, EventArgs e)
 		{
-			UpdateDocuments ();
+			UpdateDocuments();
 		}
 
 		#endregion
 
 		#region private impl
 
-		void SelectRowIndex (int index)
+		void SelectRowIndex(int index)
 		{
-//			Console.WriteLine ("SelectRowIndex " + index);
-			_treeView.Selection.SelectIter (GetTreeIterForRow (index));
+			//			Console.WriteLine ("SelectRowIndex " + index);
+			_treeView.Selection.SelectIter(GetTreeIterForRow(index));
 			var projectPath = _selectedDocument.Project.FileName.ParentDirectory;
-			var path = _selectedDocument.FileName.FullPath.ToString ().Replace (projectPath, "");
+			var path = _selectedDocument.FileName.FullPath.ToString().Replace(projectPath, "");
 			_pathLabel.Text = "[" + _selectedDocument.Project.Name + "] " + path;
 		}
 
-		void CreateTree ()
+		void CreateTree()
 		{
-			_treeView = new Gtk.TreeView ();
-			_treeView.SetSizeRequest (500, 600);
+			_treeView = new Gtk.TreeView();
+			_treeView.SetSizeRequest(500, 600);
 			//name
-			var nameColumn = new Gtk.TreeViewColumn ();
+			var nameColumn = new Gtk.TreeViewColumn();
 			nameColumn.Title = "Name";
 			nameColumn.MaxWidth = 500;
-			var nameCell = new Gtk.CellRendererText ();
-			nameColumn.PackStart (nameCell, true);
+			var nameCell = new Gtk.CellRendererText();
+			nameColumn.PackStart(nameCell, true);
 
-			_treeView.AppendColumn (nameColumn);
+			_treeView.AppendColumn(nameColumn);
 
-			nameColumn.AddAttribute (nameCell, "text", 0);
+			nameColumn.AddAttribute(nameCell, "text", 0);
 
 			_treeView.Selection.Mode = Gtk.SelectionMode.Single;
 			_treeView.Selection.Changed += _treeView_Selection_Changed;
@@ -260,91 +267,105 @@ namespace TwinTechs.EditorExtensions.View
 
 			_treeView.KeyPressEvent += HandleKeyPressEvent;
 			_treeView.KeyReleaseEvent += HandleKeyReleaseEvent;
-			_treeView.ButtonReleaseEvent += (o, args) => {
-				if (_selectedDocument != null) {
-					CloseWindow (true);
+			_treeView.ButtonReleaseEvent += (o, args) =>
+			{
+				if (_selectedDocument != null)
+				{
+					CloseWindow(true);
 				}
 			};
 
 
 		}
 
-		void _treeView_Selection_Changed (object sender, EventArgs e)
+		void _treeView_Selection_Changed(object sender, EventArgs e)
 		{
-			var selectedRows = _treeView.Selection.GetSelectedRows ();
-			if (selectedRows != null && selectedRows.Length > 0) {
-				var row = selectedRows [0];
-				var index = row.Indices [0];
-				_selectedDocument = _filteredDocuments [index];
+			var selectedRows = _treeView.Selection.GetSelectedRows();
+			if (selectedRows != null && selectedRows.Length > 0)
+			{
+				var row = selectedRows[0];
+				var index = row.Indices[0];
+				_selectedDocument = _filteredDocuments[index];
 				_selectedIndex = index;
 			}
-			UpdateSrollPosition ();
-			_searchView.GrabFocus ();
-			_searchView.SelectRegion (_searchView.Text.Length, _searchView.Text.Length);
+			UpdateSrollPosition();
+			_searchView.GrabFocus();
+			_searchView.SelectRegion(_searchView.Text.Length, _searchView.Text.Length);
 		}
 
-		void UpdateSrollPosition ()
+		void UpdateSrollPosition()
 		{
 			var rowHeight = 22;
 			var newOffset = _selectedIndex * rowHeight;
 			var currentLower = _scrolledWindow.Vadjustment.Value;
 			var currentUpper = _scrolledWindow.Vadjustment.Value + _scrolledWindow.Vadjustment.PageSize;
 
-			if (newOffset <= currentLower) {
+			if (newOffset <= currentLower)
+			{
 				_scrolledWindow.Vadjustment.Value = newOffset;
-			} else if (newOffset >= currentUpper - (_scrolledWindow.Vadjustment.PageSize / 2)) {
+			}
+			else if (newOffset >= currentUpper - (_scrolledWindow.Vadjustment.PageSize / 2))
+			{
 				_scrolledWindow.Vadjustment.Value = newOffset - (_scrolledWindow.Vadjustment.PageSize / 2);
 			}
 		}
 
-		void CloseWindow (bool moveToSelectedEntry = false)
+		void CloseWindow(bool moveToSelectedEntry = false)
 		{
-			if (_selectedDocument != null) {
-				IdeApp.Workbench.OpenDocument (_selectedDocument);
+			if (_selectedDocument != null)
+			{
+				IdeApp.Workbench.OpenDocument(_selectedDocument);
 			}
 
-			Gtk.Application.Invoke ((s, ev) => DestroyWindow ());
+			Gtk.Application.Invoke((s, ev) => DestroyWindow());
 		}
 
-		void DestroyWindow ()
+		void DestroyWindow()
 		{
 			_searchView.KeyReleaseEvent -= HandleSearchViewKeyReleaseEvent;
 			_searchView.KeyPressEvent -= HandleKeyPressEvent;
 			_searchView.FocusOutEvent -= HandleFocusOutEvent;
 			Visible = false;
-			Destroy ();
+			Destroy();
 		}
 
-		void UpdateDocuments ()
+		void UpdateDocuments()
 		{
-			_listStore = new Gtk.ListStore (typeof(string));
-			var documents = FileHistoryHelper.Instance.GetRecentDocuments (); //TODO filter
+			_listStore = new Gtk.ListStore(typeof(string));
+			var documents = FileHistoryHelper.Instance.GetRecentDocuments(); //TODO filter
 			var filterText = _searchView.Text;
-			if (string.IsNullOrEmpty (filterText)) {
-				_filteredDocuments = new Collection<FileOpenInformation> (documents);
-			} else {
-				var filteredDocuments = documents.Where (e => {
-					return MemberMatchingHelper.GetMatchWithSearchText (filterText, e.FileName.FileName);
-				}).ToList ();
-				_filteredDocuments = new Collection<FileOpenInformation> (filteredDocuments);
+			if (string.IsNullOrEmpty(filterText))
+			{
+				_filteredDocuments = new Collection<FileOpenInformation>(documents);
 			}
-			foreach (var document in _filteredDocuments) {
+			else {
+				var filteredDocuments = documents.Where(e =>
+				{
+					return MemberMatchingHelper.GetMatchWithSearchText(filterText, e.FileName.FileName);
+				}).ToList();
+				_filteredDocuments = new Collection<FileOpenInformation>(filteredDocuments);
+			}
+			foreach (var document in _filteredDocuments)
+			{
 				//TODO improve this
 				var name = document.FileName.FileName;
-				_listStore.AppendValues (name);
+				_listStore.AppendValues(name);
 			}
 
 			_treeView.Model = _listStore;
 
-			if (_filteredDocuments.Count > 0) {
-				if (_selectedDocument != null) {
-					var newIndex = _filteredDocuments.IndexOf (_selectedDocument);
-					SelectRowIndex (newIndex == -1 ? 0 : newIndex);
-				} else {
-					SelectRowIndex (0);
+			if (_filteredDocuments.Count > 0)
+			{
+				if (_selectedDocument != null)
+				{
+					var newIndex = _filteredDocuments.IndexOf(_selectedDocument);
+					SelectRowIndex(newIndex == -1 ? 0 : newIndex);
+				}
+				else {
+					SelectRowIndex(0);
 				}
 			}
-			UpdateSrollPosition ();
+			UpdateSrollPosition();
 		}
 
 		#endregion

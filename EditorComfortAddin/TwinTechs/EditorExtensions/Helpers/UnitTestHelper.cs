@@ -17,146 +17,178 @@ namespace TwinTechs.EditorExtensions.Helpers
 
 		string[] AllPossibleSuffixesForFileMatching;
 		string[] ProjectSuffixes;
-		Dictionary<string,string> _statusTextsForFileSuffix = new Dictionary<string, string> {
-			["Tests.cs" ] = "-> TEST",
-			[".cs" ] = "-> IMPL",
+		Dictionary<string, string> _statusTextsForFileSuffix = new Dictionary<string, string>
+		{
+			["Tests.cs"] = "-> TEST",
+			[".cs"] = "-> IMPL",
 		};
 
 		static UnitTestHelper _instance;
 
-		public static UnitTestHelper Instance {
-			get {
-				if (_instance == null) {
-					_instance = new UnitTestHelper ();
+		public static UnitTestHelper Instance
+		{
+			get
+			{
+				if (_instance == null)
+				{
+					_instance = new UnitTestHelper();
 				}
 				return _instance;
 			}
 		}
 
-		public UnitTestHelper ()
+		public UnitTestHelper()
 		{
-			AllPossibleSuffixesForFileMatching = new string[]{ "Tests.cs", ".cs" };
-			ProjectSuffixes = new string[]{ "Tests", ".Tests" };
+			AllPossibleSuffixesForFileMatching = new string[] { "Tests.cs", ".cs" };
+			ProjectSuffixes = new string[] { "Tests", ".Tests" };
 		}
 
 		#region methods that are virtual to facilitate unit testing
 
-		internal virtual string CurrentFileName {
-			get {
-				return IdeApp.Workbench.ActiveDocument.FileName.FullPath.ToString ();
+		internal virtual string CurrentFileName
+		{
+			get
+			{
+				return IdeApp.Workbench.ActiveDocument.FileName.FullPath.ToString();
 			}
 		}
 
-		internal virtual bool GetFileExists (string filename)
+		internal virtual bool GetFileExists(string filename)
 		{
-			return File.Exists (filename);
+			return File.Exists(filename);
 		}
 
 		#endregion
 
-		public bool IsTogglingPossibleForActiveDocument {
-			get {
-				return GetFileExists (TestsFileNameForActiveDocument) &&
-				GetFileExists (ImplementationFileNameForActiveDocument);
+		public bool IsTogglingPossibleForActiveDocument
+		{
+			get
+			{
+				return GetFileExists(TestsFileNameForActiveDocument) &&
+				GetFileExists(ImplementationFileNameForActiveDocument);
 			}
 		}
 
-		public bool IsActiveFileUnitTestFile {
-			get {
-				return CurrentFileName.EndsWith ("Tests.cs");
+		public bool IsActiveFileUnitTestFile
+		{
+			get
+			{
+				return CurrentFileName.EndsWith("Tests.cs");
 			}
 		}
 
-		public bool IsActiveFileImplementationFile {
-			get {
-				return CurrentFileName.EndsWith (".cs");
+		public bool IsActiveFileImplementationFile
+		{
+			get
+			{
+				return CurrentFileName.EndsWith(".cs");
 			}
 		}
 
-		public string RootFileNameForActiveDocument {
-			get {
+		public string RootFileNameForActiveDocument
+		{
+			get
+			{
 				var file = CurrentFileName;
-				foreach (var suffix in AllPossibleSuffixesForFileMatching) {
-					if (file.EndsWith (suffix)) {
-						return file.Replace (suffix, "");
+				foreach (var suffix in AllPossibleSuffixesForFileMatching)
+				{
+					if (file.EndsWith(suffix))
+					{
+						return file.Replace(suffix, "");
 					}
 				}
 				return null;
 			}
 		}
 
-		public string TestsFileNameForActiveDocument {
-			get {
-				var rootFileName = GetRootFileNameForActiveDocument ();
-				var project = GetProject (true);
-				if (rootFileName.EndsWith (".cs")) {
-					rootFileName = rootFileName.Replace (".cs", "Tests.cs");
-				}
-				var targetFileName = GetFileNameInProject (rootFileName, project);
-				return targetFileName;
-			}
-		}
-
-		public string ImplementationFileNameForActiveDocument {
-			get {
-				var rootFileName = GetRootFileNameForActiveDocument ();
-				var project = GetProject (false);
-				if (rootFileName.EndsWith ("Tests.cs")) {
-					rootFileName = rootFileName.Replace ("Tests.cs", ".cs");
-				}
-				var targetFileName = GetFileNameInProject (rootFileName, project);
-				return targetFileName;
-				
-			}
-		}
-
-		public void ToggleTestsAndImplementation ()
+		public string TestsFileNameForActiveDocument
 		{
-			var entityInSourceDocument = MemberExtensionsHelper.Instance.GetEntityAtCaret ();
-			entityInSourceDocument = entityInSourceDocument ?? MemberExtensionsHelper.Instance.GetNearestEntity (false);
+			get
+			{
+				var rootFileName = GetRootFileNameForActiveDocument();
+				var project = GetProject(true);
+				if (rootFileName.EndsWith(".cs"))
+				{
+					rootFileName = rootFileName.Replace(".cs", "Tests.cs");
+				}
+				var targetFileName = GetFileNameInProject(rootFileName, project);
+				return targetFileName;
+			}
+		}
+
+		public string ImplementationFileNameForActiveDocument
+		{
+			get
+			{
+				var rootFileName = GetRootFileNameForActiveDocument();
+				var project = GetProject(false);
+				if (rootFileName.EndsWith("Tests.cs"))
+				{
+					rootFileName = rootFileName.Replace("Tests.cs", ".cs");
+				}
+				var targetFileName = GetFileNameInProject(rootFileName, project);
+				return targetFileName;
+
+			}
+		}
+
+		public void ToggleTestsAndImplementation()
+		{
+			var entityInSourceDocument = MemberExtensionsHelper.Instance.GetEntityAtCaret();
+			entityInSourceDocument = entityInSourceDocument ?? MemberExtensionsHelper.Instance.GetNearestEntity(false);
 			bool isMovingToUnitTestFile = !IsActiveFileUnitTestFile;
 			//get the member in the current file
 			var targetFilename = isMovingToUnitTestFile ? TestsFileNameForActiveDocument : ImplementationFileNameForActiveDocument;
-			var project = GetProject (!IsActiveFileUnitTestFile);
-			var success = OpenDocument (targetFilename, project);
-			if (success) {
-				
-				if (entityInSourceDocument != null) {
-					if (isMovingToUnitTestFile) {
-						GotoImplementationMethodInUnitTestFile (entityInSourceDocument.Name);
-					} else {
-						GotoTestMethodInImplementationFile (entityInSourceDocument.Name);
+			var project = GetProject(!IsActiveFileUnitTestFile);
+			var success = OpenDocument(targetFilename, project);
+			if (success)
+			{
+
+				if (entityInSourceDocument != null)
+				{
+					if (isMovingToUnitTestFile)
+					{
+						GotoImplementationMethodInUnitTestFile(entityInSourceDocument.Name);
+					}
+					else {
+						GotoTestMethodInImplementationFile(entityInSourceDocument.Name);
 					}
 				}
 			}
 		}
 
-		public bool GotoTestMethodInImplementationFile (string testMethodName)
+		public bool GotoTestMethodInImplementationFile(string testMethodName)
 		{
-			var implementationMethodName = UnitTestHelper.GetMethodNameFromTestName (testMethodName);
-			if (implementationMethodName == "Constructor") {
+			var implementationMethodName = UnitTestHelper.GetMethodNameFromTestName(testMethodName);
+			if (implementationMethodName == "Constructor")
+			{
 				implementationMethodName = ".ctor";
 			}
-			var entities = MemberExtensionsHelper.Instance.GetEntities ();
+			var entities = MemberExtensionsHelper.Instance.GetEntities();
 			//TODO make filter
-			foreach (var e in entities) {
-				if (e.Name.Contains (implementationMethodName)) {
-					MemberExtensionsHelper.Instance.GotoMember (e);
+			foreach (var e in entities)
+			{
+				if (e.Name.Contains(implementationMethodName))
+				{
+					MemberExtensionsHelper.Instance.GotoMember(e);
 					return true;
 				}
 			}
 			return false;
 		}
 
-		public bool GotoImplementationMethodInUnitTestFile (string implementationMethodName)
+		public bool GotoImplementationMethodInUnitTestFile(string implementationMethodName)
 		{
-			var entities = MemberExtensionsHelper.Instance.GetEntities ();
+			var entities = MemberExtensionsHelper.Instance.GetEntities();
 			//TODO make filter
-			foreach (var e in entities) {
-				var possibleUnitTestNames = GetPossibleUnitTestNames (implementationMethodName);
-				foreach (var possibleName in possibleUnitTestNames) {
-					if (e.Name.Contains (possibleName)) {
-						MemberExtensionsHelper.Instance.GotoMember (e);
+			foreach (var e in entities)
+			{
+				var possibleUnitTestNames = GetPossibleUnitTestNames(implementationMethodName);
+				foreach (var possibleName in possibleUnitTestNames)
+				{
+					if (e.Name.Contains(possibleName))
+					{
+						MemberExtensionsHelper.Instance.GotoMember(e);
 						return true;
 					}
 				}
@@ -164,62 +196,72 @@ namespace TwinTechs.EditorExtensions.Helpers
 			return false;
 		}
 
-		string[]GetPossibleUnitTestNames (string methodName)
+		string[] GetPossibleUnitTestNames(string methodName)
 		{
 			return new string[] {
-				methodName, 
+				methodName,
 				"Test" + methodName,
 				"Test_" + methodName
 			};
 		}
 
-		public string GetRootFileNameForActiveDocument ()
+		public string GetRootFileNameForActiveDocument()
 		{
 			var project = IdeApp.Workbench.ActiveDocument.Project;
 			var filename = IdeApp.Workbench.ActiveDocument.FileName;
-			var filePath = filename.FullPath.ToString ();
-			if (filePath?.Length > 0) {
-				var projectPath = project.GetAbsoluteChildPath ("").ToString ();
-				if (projectPath?.Length < filePath.Length) {
-					var relativeFilePath = filename.ToString ().Substring (projectPath.Length);
-					relativeFilePath = relativeFilePath.Replace ("Tests.cs", ".cs");
+			var filePath = filename.FullPath.ToString();
+			if (filePath?.Length > 0)
+			{
+				var projectPath = project.GetAbsoluteChildPath("").ToString();
+				if (projectPath?.Length < filePath.Length)
+				{
+					var relativeFilePath = filename.ToString().Substring(projectPath.Length);
+					relativeFilePath = relativeFilePath.Replace("Tests.cs", ".cs");
 					return relativeFilePath;
-				} else {
+				}
+				else {
 					return null;
 				}
-			} else {
+			}
+			else {
 				return null;
-				
+
 			}
 		}
 
-		string GetFileNameInProject (string filename, Project project)
+		string GetFileNameInProject(string filename, Project project)
 		{
-			var projectPath = project.GetAbsoluteChildPath ("").ToString ();
+			var projectPath = project.GetAbsoluteChildPath("").ToString();
 			var filePath = projectPath + filename;
 			return filePath;
 		}
 
 
 
-		public Project GetProject (bool isUnitTestProject)
+		public Project GetProject(bool isUnitTestProject)
 		{
 			Project project = null;
-			foreach (var suffix in ProjectSuffixes) {
+			foreach (var suffix in ProjectSuffixes)
+			{
 				var projectName = IdeApp.Workbench.ActiveDocument.Project.Name;
-				
-				if (isUnitTestProject) {
-					if (!projectName.EndsWith (suffix)) {
+
+				if (isUnitTestProject)
+				{
+					if (!projectName.EndsWith(suffix))
+					{
 						projectName += suffix;
 					}
-				} else {
-					if (projectName.EndsWith (suffix)) {
-						projectName = projectName.Remove (projectName.Length - suffix.Length);
+				}
+				else {
+					if (projectName.EndsWith(suffix))
+					{
+						projectName = projectName.Remove(projectName.Length - suffix.Length);
 					}
 				}
 
-				project = IdeApp.Workspace.GetAllProjects ().FirstOrDefault ((p) => p.Name == projectName);
-				if (project != null) {
+				project = IdeApp.Workspace.GetAllProjects().FirstOrDefault((p) => p.Name == projectName);
+				if (project != null)
+				{
 					break;
 				}
 			}
@@ -228,58 +270,68 @@ namespace TwinTechs.EditorExtensions.Helpers
 
 
 
-		public virtual bool OpenDocument (string filename, Project project)
+		public virtual bool OpenDocument(string filename, Project project)
 		{
-			if (!string.IsNullOrEmpty (filename) && File.Exists (filename)) {
-				var filePath = new FilePath (filename);
-				try {
-					
-					IdeHelper.OpenDocument (filePath, project);
-					StatusHelper.ShowStatus (MonoDevelop.Ide.Gui.Stock.OpenFileIcon, GetStatusPrefix (filename) + ": " + filename);
+			if (!string.IsNullOrEmpty(filename) && File.Exists(filename))
+			{
+				var filePath = new FilePath(filename);
+				try
+				{
+
+					IdeHelper.OpenDocument(filePath, project);
+					StatusHelper.ShowStatus(MonoDevelop.Ide.Gui.Stock.OpenFileIcon, GetStatusPrefix(filename) + ": " + filename);
 					return true;
-				} catch (Exception ex) {
+				}
+				catch (Exception ex)
+				{
 				}
 			}
-			StatusHelper.ShowStatus (MonoDevelop.Ide.Gui.Stock.StatusError, "Could not find associated file");
+			StatusHelper.ShowStatus(MonoDevelop.Ide.Gui.Stock.StatusError, "Could not find associated file");
 			return false;
 		}
 
 		#region project level methods
 
-		public bool CreateTestFile (Project unitTestProject, string fileLocation)
+		public bool CreateTestFile(Project unitTestProject, string fileLocation)
 		{
-			var implementationClassName = System.IO.Path.GetFileNameWithoutExtension (ImplementationFileNameForActiveDocument);
-			var declaringType = MemberExtensionsHelper.Instance.GetDeclaringTypeWithName (implementationClassName);
-			if (declaringType == null) {
+			var implementationClassName = System.IO.Path.GetFileNameWithoutExtension(ImplementationFileNameForActiveDocument);
+			var declaringType = MemberExtensionsHelper.Instance.GetDeclaringTypeWithName(implementationClassName);
+			if (declaringType == null)
+			{
 				return false;
 			}
-			var unitTestClassName = System.IO.Path.GetFileNameWithoutExtension (TestsFileNameForActiveDocument);
-			var pathName = System.IO.Path.GetDirectoryName (fileLocation);
+			var unitTestClassName = System.IO.Path.GetFileNameWithoutExtension(TestsFileNameForActiveDocument);
+			var pathName = System.IO.Path.GetDirectoryName(fileLocation);
 
 			//TODO get root namespace of both impl/test projects, if required and set accordingly
 			var nameSpace = "";
 			nameSpace += declaringType.Namespace;
-			var contents = TestClassTemplate.Replace ("NAMESPACE", nameSpace);
-			contents = contents.Replace ("CLASSNAME", unitTestClassName);
-			try {
-				if (!Directory.Exists (pathName)) {
-					Directory.CreateDirectory (pathName);
+			var contents = TestClassTemplate.Replace("NAMESPACE", nameSpace);
+			contents = contents.Replace("CLASSNAME", unitTestClassName);
+			try
+			{
+				if (!Directory.Exists(pathName))
+				{
+					Directory.CreateDirectory(pathName);
 				}
-				System.IO.File.WriteAllText (fileLocation, contents);
-				unitTestProject.AddFile (fileLocation);
-				IdeApp.ProjectOperations.Save (unitTestProject);
+				System.IO.File.WriteAllText(fileLocation, contents);
+				unitTestProject.AddFile(fileLocation);
+				//FIXME - make this async
+				IdeApp.ProjectOperations.SaveAsync(unitTestProject);
 				return true;
-			} catch (Exception ex) {
-				StatusHelper.ShowStatus (Stock.StatusError, "Couldn't create unit test file");
+			}
+			catch (Exception ex)
+			{
+				StatusHelper.ShowStatus(Stock.StatusError, "Couldn't create unit test file");
 				return false;
 			}
 
 		}
 
-		public bool CreateTestProject ()
+		public bool CreateTestProject()
 		{
 			//TODO not yet supported
-			StatusHelper.ShowStatus (Stock.StatusError, "Please create a unit test project and try again");
+			StatusHelper.ShowStatus(Stock.StatusError, "Please create a unit test project and try again");
 			return false;
 		}
 
@@ -288,20 +340,22 @@ namespace TwinTechs.EditorExtensions.Helpers
 
 		#region private impl
 
-		internal string GetStatusPrefix (string filename)
+		internal string GetStatusPrefix(string filename)
 		{
-			foreach (var key in _statusTextsForFileSuffix.Keys) {
-				if (filename.EndsWith (key)) {
-					return _statusTextsForFileSuffix [key];
+			foreach (var key in _statusTextsForFileSuffix.Keys)
+			{
+				if (filename.EndsWith(key))
+				{
+					return _statusTextsForFileSuffix[key];
 				}
 			}
 			return null;
 		}
 
-		public static string GetMethodNameFromTestName (string text)
+		public static string GetMethodNameFromTestName(string text)
 		{
 			var pattern = @"(?<=(Test_|Test))[^_]([^_]*)";
-			var match = Regex.Match (text, pattern);
+			var match = Regex.Match(text, pattern);
 			return match.Value;
 		}
 

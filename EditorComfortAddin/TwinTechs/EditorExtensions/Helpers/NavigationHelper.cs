@@ -1,7 +1,6 @@
 ﻿using System;
 using MonoDevelop.Ide;
 using MonoDevelop.Core;
-using MonoDevelop.Refactoring;
 using MonoDevelop.Ide.Gui;
 using ICSharpCode.NRefactory.Semantics;
 using ICSharpCode.NRefactory.TypeSystem;
@@ -10,9 +9,9 @@ namespace TwinTechs.EditorExtensions.Helpers
 {
 	public class NavigationHelper
 	{
-		public NavigationHelper ()
+		public NavigationHelper()
 		{
-			
+
 		}
 	}
 }

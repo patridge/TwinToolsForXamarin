@@ -1,16 +1,17 @@
 ﻿using System;
 using MonoDevelop.Ide;
+using System.Linq;
 
 namespace TwinTechs.EditorExtensions.Helpers
 {
 	public static class RootWorkspaceExtensions
 	{
-		public static bool GetIsWorkspaceOpen (this RootWorkspace workspace)
+		public static bool GetIsWorkspaceOpen(this RootWorkspace workspace)
 		{
-			return workspace.GetAllSolutions ().Count > 0;
+			return workspace.GetAllSolutionItems().Any();
 		}
 
-		public static bool GetIsDocumentOpen (this RootWorkspace workspace)
+		public static bool GetIsDocumentOpen(this RootWorkspace workspace)
 		{
 			return IdeApp.Workbench.ActiveDocument != null;
 		}

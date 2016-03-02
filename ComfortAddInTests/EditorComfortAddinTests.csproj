@@ -52,7 +52,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\EditorComfortAddin\EditorComfortAddin.csproj">
-      <Project>{EB1A8C73-75D5-442D-8382-4676F0A82BE5}</Project>
+      <Project>{1910E4A0-8339-4F6A-9B44-D08CA3AB3E6D}</Project>
       <Name>EditorComfortAddin</Name>
     </ProjectReference>
   </ItemGroup>

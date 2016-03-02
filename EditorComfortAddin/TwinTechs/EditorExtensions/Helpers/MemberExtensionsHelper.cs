@@ -24,10 +24,13 @@ namespace TwinTechs.EditorExtensions.Helpers
 
 		Collection<IUnresolvedEntity> _cachedEntities;
 
-		public static MemberExtensionsHelper Instance {
-			get {
-				if (_instance == null) {
-					_instance = new MemberExtensionsHelper ();
+		public static MemberExtensionsHelper Instance
+		{
+			get
+			{
+				if (_instance == null)
+				{
+					_instance = new MemberExtensionsHelper();
 				}
 				return _instance;
 			}
@@ -41,35 +44,42 @@ namespace TwinTechs.EditorExtensions.Helpers
 		/// Gets the entities.
 		/// </summary>
 		/// <returns>The entities.</returns>
-		public Collection<IUnresolvedEntity> GetEntities ()
+		public Collection<IUnresolvedEntity> GetEntities()
 		{
 			var editor = IdeApp.Workbench.ActiveDocument.Editor;
 			var parsedDoc = IdeApp.Workbench.ActiveDocument.ParsedDocument;
-			if (_mostRecentDocument != IdeApp.Workbench.ActiveDocument) {
+			if (_mostRecentDocument != IdeApp.Workbench.ActiveDocument)
+			{
 				_mostRecentDocument = IdeApp.Workbench.ActiveDocument;
-				_mostRecentDocument.UpdateParseDocument ();
+				_mostRecentDocument.UpdateParseDocument();
 				IsDirty = true;
 			}
-			if (_lastUpdateTime == null) {
+			if (_lastUpdateTime == default(DateTime))
+			{
 				IsDirty = true;
-			} else {
+			}
+			else {
 				//TODO would be nice to get real dirty flag on the docs editor
 				var now = DateTime.Now;
 				var secondsSinceLastInvocation = (now - _lastUpdateTime).TotalSeconds;
-				if (secondsSinceLastInvocation > 2) {
+				if (secondsSinceLastInvocation > 2)
+				{
 					IsDirty = true;
 				}
 			}
 
-			if (IsDirty || _cachedEntities == null) {
-				IdeApp.Workbench.ActiveDocument.UpdateParseDocument ();
+			if (IsDirty || _cachedEntities == null)
+			{
+				IdeApp.Workbench.ActiveDocument.UpdateParseDocument();
 				parsedDoc = IdeApp.Workbench.ActiveDocument.ParsedDocument;
-				_cachedEntities = new Collection<IUnresolvedEntity> ();
-				foreach (var typeDef in parsedDoc.TopLevelTypeDefinitions) {
+				_cachedEntities = new Collection<IUnresolvedEntity>();
+				foreach (var typeDef in parsedDoc.TopLevelTypeDefinitions)
+				{
 					//TODO pretty print these
-					_cachedEntities.Add (typeDef);
-					foreach (var member in typeDef.Members) {
-						_cachedEntities.Add (member);
+					_cachedEntities.Add(typeDef);
+					foreach (var member in typeDef.Members)
+					{
+						_cachedEntities.Add(member);
 					}
 				}
 				_lastUpdateTime = DateTime.Now;
@@ -83,37 +93,42 @@ namespace TwinTechs.EditorExtensions.Helpers
 		/// Gotos the member.
 		/// </summary>
 		/// <param name="selectedMember">Selected member.</param>
-		public void GotoMember (object selectedMember)
+		public void GotoMember(object selectedMember)
 		{
 			var editor = IdeApp.Workbench.ActiveDocument.Editor;
 			var member = selectedMember as IUnresolvedEntity;
-			if (member != null) {
+			if (member != null)
+			{
 				var memberType = selectedMember as IUnresolvedEntity;
 				var region = memberType.Region;
-				editor.SetCaretTo (region.BeginLine, region.BeginColumn, true, false);
-				editor.CenterToCaret ();
+				editor.SetCaretLocation(region.BeginLine, region.BeginColumn, true, false);
+				editor.CenterToCaret();
 			}
 		}
 
-		public void GotoMemberWithName (string memberName)
+		public void GotoMemberWithName(string memberName)
 		{
 			var editor = IdeApp.Workbench.ActiveDocument.Editor;
-			var entities = GetEntities ();
-			foreach (var entity in entities) {
-				if (entity.Name.EndsWith (memberName)) {
+			var entities = GetEntities();
+			foreach (var entity in entities)
+			{
+				if (entity.Name.EndsWith(memberName))
+				{
 					var region = entity.Region;
-					editor.SetCaretTo (region.BeginLine, region.BeginColumn, true, false);
-					editor.CenterToCaret ();	
+					editor.SetCaretLocation(region.BeginLine, region.BeginColumn, true, false);
+					editor.CenterToCaret();
 				}
 			}
 		}
 
-		public IMember GetMemberWithName (string memberName)
+		public IMember GetMemberWithName(string memberName)
 		{
 			var editor = IdeApp.Workbench.ActiveDocument.Editor;
-			var entities = GetEntities ();
-			foreach (var entity in entities) {
-				if (entity.Name.EndsWith (memberName)) {
+			var entities = GetEntities();
+			foreach (var entity in entities)
+			{
+				if (entity.Name.EndsWith(memberName))
+				{
 					return entity as IMember;
 				}
 			}
@@ -126,15 +141,18 @@ namespace TwinTechs.EditorExtensions.Helpers
 		/// Gets the entity at caret.
 		/// </summary>
 		/// <returns>The entity at caret.</returns>
-		public IUnresolvedEntity GetEntityAtCaret ()
+		public IUnresolvedEntity GetEntityAtCaret()
 		{
 			var editor = IdeApp.Workbench.ActiveDocument.Editor;
 
 			//TODO cache these bad boys
-			var entities = GetEntities ();
-			foreach (var entity in entities) {
-				if (!(entity is IUnresolvedTypeDefinition)) {
-					if (entity.Region.Contains (editor.Caret.Location)) {
+			var entities = GetEntities();
+			foreach (var entity in entities)
+			{
+				if (!(entity is IUnresolvedTypeDefinition))
+				{
+					if (entity.Region.Contains(editor.CaretLine, editor.CaretColumn))
+					{
 						return entity;
 					}
 				}
@@ -148,25 +166,32 @@ namespace TwinTechs.EditorExtensions.Helpers
 		/// </summary>
 		/// <returns>The nearest entity.</returns>
 		/// <param name="isDirectionDown">If set to <c>true</c> is direction down.</param>
-		public IUnresolvedEntity GetNearestEntity (bool isDirectionDown, bool includeItemOnLine = false)
+		public IUnresolvedEntity GetNearestEntity(bool isDirectionDown, bool includeItemOnLine = false)
 		{
 			IUnresolvedEntity returnEntity;
 			var editor = IdeApp.Workbench.ActiveDocument.Editor;
 
-			var entities = isDirectionDown ? GetEntities () : GetEntities ().Reverse ();
-			var enumerator = entities.GetEnumerator ();
-			var lineNumber = editor.Caret.Line;
+			var entities = isDirectionDown ? GetEntities() : GetEntities().Reverse();
+			var enumerator = entities.GetEnumerator();
+			var lineNumber = editor.CaretLine;
 
-			while (enumerator.MoveNext ()) {
+			while (enumerator.MoveNext())
+			{
 				var currentEntity = enumerator.Current;
-				if ((includeItemOnLine && currentEntity.Region.BeginLine == lineNumber)) {
+				if ((includeItemOnLine && currentEntity.Region.BeginLine == lineNumber))
+				{
 					return currentEntity;
-				} else if (isDirectionDown) {
-					if (currentEntity.Region.BeginLine > lineNumber) {
+				}
+				else if (isDirectionDown)
+				{
+					if (currentEntity.Region.BeginLine > lineNumber)
+					{
 						return currentEntity;
 					}
-				} else {
-					if (currentEntity.Region.BeginLine < lineNumber) {
+				}
+				else {
+					if (currentEntity.Region.BeginLine < lineNumber)
+					{
 						return currentEntity;
 					}
 				}
@@ -177,21 +202,25 @@ namespace TwinTechs.EditorExtensions.Helpers
 		/// <summary>
 		/// Gotos the next entity.
 		/// </summary>
-		public void GotoNextEntity ()
+		public void GotoNextEntity()
 		{
-			var member = GetEntityAtCaret ();
-			if (member == null) {
-				member = GetNearestEntity (true);
-				if (member != null) {
-					GotoMember (member);
+			var member = GetEntityAtCaret();
+			if (member == null)
+			{
+				member = GetNearestEntity(true);
+				if (member != null)
+				{
+					GotoMember(member);
 				}
-			} else {
-				var members = GetEntities ();
-				var index = GetIndexOfMember (member);
+			}
+			else {
+				var members = GetEntities();
+				var index = GetIndexOfMember(member);
 
-				if (index + 1 < members.Count) {
+				if (index + 1 < members.Count)
+				{
 
-					GotoMember (members [index + 1]);
+					GotoMember(members[index + 1]);
 				}
 			}
 
@@ -200,41 +229,52 @@ namespace TwinTechs.EditorExtensions.Helpers
 		/// <summary>
 		/// Gotos the previous entity.
 		/// </summary>
-		public void GotoPreviousEntity ()
+		public void GotoPreviousEntity()
 		{
-			var member = GetEntityAtCaret ();
+			var member = GetEntityAtCaret();
 			var editor = IdeApp.Workbench.ActiveDocument.Editor;
-			if (member == null) {
-				member = GetNearestEntity (false);
-				if (member != null) {
-					GotoMember (member);
+			if (member == null)
+			{
+				member = GetNearestEntity(false);
+				if (member != null)
+				{
+					GotoMember(member);
 				}
-			} else if (member.Region.BeginLine < editor.Caret.Line) {
-				GotoMember (member);
-			} else {
-				var members = GetEntities ();
-				var index = GetIndexOfMember (member);
-				if (index - 1 > 0) {
-					GotoMember (members [index - 1]);
+			}
+			else if (member.Region.BeginLine < editor.CaretLine)
+			{
+				GotoMember(member);
+			}
+			else {
+				var members = GetEntities();
+				var index = GetIndexOfMember(member);
+				if (index - 1 > 0)
+				{
+					GotoMember(members[index - 1]);
 				}
 			}
 		}
 
-		public IUnresolvedTypeDefinition GetDeclaringTypeInDocument (TextLocation loc)
+		public IUnresolvedTypeDefinition GetDeclaringTypeInDocument(TextLocation loc)
 		{
 			var editor = IdeApp.Workbench.ActiveDocument.Editor;
 			var parsedDoc = IdeApp.Workbench.ActiveDocument.ParsedDocument;
 
-			var declaringType = parsedDoc.GetInnermostTypeDefinition (loc);
-			if (declaringType == null) {
-				declaringType = parsedDoc.GetTopLevelTypeDefinition (loc);
+			var declaringType = parsedDoc.GetInnermostTypeDefinition(loc);
+			if (declaringType == null)
+			{
+				declaringType = parsedDoc.GetTopLevelTypeDefinition(loc);
 			}
-			if (declaringType == null) {
-				var entity = GetNearestEntity (true);
-				if (entity != null) {
-					if (entity.SymbolKind == SymbolKind.TypeDefinition) {
+			if (declaringType == null)
+			{
+				var entity = GetNearestEntity(true);
+				if (entity != null)
+				{
+					if (entity.SymbolKind == SymbolKind.TypeDefinition)
+					{
 						declaringType = entity as IUnresolvedTypeDefinition;
-					} else {
+					}
+					else {
 						declaringType = entity.DeclaringTypeDefinition;
 					}
 				}
@@ -242,12 +282,12 @@ namespace TwinTechs.EditorExtensions.Helpers
 			return declaringType;
 		}
 
-		public IUnresolvedTypeDefinition GetDeclaringTypeWithName (string typeName)
+		public IUnresolvedTypeDefinition GetDeclaringTypeWithName(string typeName)
 		{
-			var entities = GetEntities ();
-			var declaringType = entities.FirstOrDefault (e => 
-				e.Name.EndsWith (typeName) && e.SymbolKind == SymbolKind.TypeDefinition
-			                    );
+			var entities = GetEntities();
+			var declaringType = entities.FirstOrDefault(e =>
+			   e.Name.EndsWith(typeName) && e.SymbolKind == SymbolKind.TypeDefinition
+								);
 			return declaringType as IUnresolvedTypeDefinition;
 		}
 
@@ -256,17 +296,19 @@ namespace TwinTechs.EditorExtensions.Helpers
 
 		#region private impl
 
-	
+
 		/// <summary>
 		/// Gets the index of member.
 		/// </summary>
 		/// <returns>The index of member.</returns>
 		/// <param name="member">Member.</param>
-		int GetIndexOfMember (IUnresolvedEntity member)
+		int GetIndexOfMember(IUnresolvedEntity member)
 		{
 			int i = 0;
-			for (i = 0; i < _cachedEntities.Count; i++) {
-				if (_cachedEntities [i].Region == member.Region) {
+			for (i = 0; i < _cachedEntities.Count; i++)
+			{
+				if (_cachedEntities[i].Region == member.Region)
+				{
 					return i;
 				}
 			}
@@ -275,7 +317,7 @@ namespace TwinTechs.EditorExtensions.Helpers
 
 		#endregion
 
-	
+
 	}
 
 }

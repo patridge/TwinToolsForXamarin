@@ -32,6 +32,9 @@ The addin provides the following features:
   
 Please check the default hotkeys and be prepared to reconfigure, as they are currently to my preference and may not be to yours.
 
+## Overview 
+You will find an overview video here : [https://www.youtube.com/watch?v=_sYSDFR0H5Q](https://www.youtube.com/watch?v=_sYSDFR0H5Q), to help get you started.
+
 ##A note on naming conventions
 
 ###Toggling ViewModel/Xaml
@@ -55,3 +58,6 @@ Please check the default hotkeys and be prepared to reconfigure, as they are cur
   * It will update the namespace to the _correct_ namespace for the files location in the source code folder. You cannot change the namespace arbitrarily
   * Refactoring other files is experimental. You'd be best served to commit your work before trying. Don't worry, it will ask you if you want to do that before it goes doing crazy stuff
   * this feature is WIP
+  
+### Xamarin Studio 6.0 (roslyn) support
+This work has been started, and will be complete when Xamarin Studio 6.0 goes to beta.

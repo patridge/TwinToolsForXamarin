@@ -5,8 +5,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EditorComfortAddinTests", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EditorComfortAddin", "EditorComfortAddin\EditorComfortAddin.csproj", "{1910E4A0-8339-4F6A-9B44-D08CA3AB3E6D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EditorComfortAddin2", "EditorComfortAddin2\EditorComfortAddin2.csproj", "{2B5A90EB-4922-4400-B3E5-1A9A138E731C}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,10 +19,6 @@ Global
 		{1910E4A0-8339-4F6A-9B44-D08CA3AB3E6D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1910E4A0-8339-4F6A-9B44-D08CA3AB3E6D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1910E4A0-8339-4F6A-9B44-D08CA3AB3E6D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{2B5A90EB-4922-4400-B3E5-1A9A138E731C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2B5A90EB-4922-4400-B3E5-1A9A138E731C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2B5A90EB-4922-4400-B3E5-1A9A138E731C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2B5A90EB-4922-4400-B3E5-1A9A138E731C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		Policies = $0

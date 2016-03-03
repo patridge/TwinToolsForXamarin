@@ -2,7 +2,7 @@
 
 ## Overview
 
-At [Twin Tecnologies](https://www.twintechs.com/) we pride ourselves on craftsmanship and efficiency. We think Xamarin Studio is great; but there are a few gaps in the navigation/tooling which stops us from being as productive as when we use JetBrains IDEA/ReSharper.
+At [Twin Technologies](https://www.twintechs.com/) we pride ourselves on craftsmanship and efficiency. We think Xamarin Studio is great; but there are a few gaps in the navigation/tooling which stops us from being as productive as when we use JetBrains IDEA/ReSharper.
 
 As such, I've been putting together features into a personal add-in over the past year, which we're now making available to the community as an open source project. You can view the source and raise bugs/pull requests [here](https://github.com/georgejecook/TwinToolsForXamarin)
 

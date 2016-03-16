@@ -77,7 +77,7 @@
 		<Command id="TwinTechs.EditorExtensions.Commands.FixNamespace"
 			_label="Fix Namespace"
 			_description="Sets namespace to match file location"
-			shortcut="Alt|Meta|n"
+			shortcut="Alt|Ctrl|n"
 			macShortcut="Alt|Meta|n"
 			defaultHandler="TwinTechs.EditorExtensions.Commands.FixNamespace" />
 	</Extension>

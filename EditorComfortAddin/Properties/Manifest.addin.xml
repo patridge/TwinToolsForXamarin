@@ -7,15 +7,15 @@
 		<Command id="TwinTechs.EditorExtensions.Commands.BrowseRecentDocument"
 			_label="Browse recent documents"
 			_description="Browse recently opened documents"
-			shortcut="Meta|E"
-			macShortcut="Meta|E"
+			shortcut="Ctrl|E"
+			macShortcut="Ctrl|E"
 			defaultHandler="TwinTechs.EditorExtensions.Commands.ShowRecentDocumentBrowser" />
 
 		<Command id="TwinTechs.EditorExtensions.Commands.GoToDeclarationPlus"
 			_label="Go to Declaration+"
 			_description="Advanced version of go to declaration. Can go direct to implementing classes, and some Xaml types."
-			shortcut="Meta|b"
-			macShortcut="Meta|b"
+			shortcut="Alt|D"
+			macShortcut="Ctrl|D"
 			defaultHandler="TwinTechs.EditorExtensions.Commands.GoToDeclarationPlus" />
 
 		<Command id="TwinTechs.EditorExtensions.Commands.ShowMembers"
@@ -28,14 +28,14 @@
 		<Command id="TwinTechs.EditorExtensions.Commands.PreviousMember"
 			_label="Previous Member"
 			_description="Goes to the previous member in a code file"
-			shortcut="Ctrl|Up"
+			shortcut="Shift|Ctrl|Up"
 			macShortcut="Ctrl|Up"
 			defaultHandler="TwinTechs.EditorExtensions.Commands.PreviousMember" />
 
 		<Command id="TwinTechs.EditorExtensions.Commands.NextMember"
 			_label="Next Member"
 			_description="Goes to the next member in a code file"
-			shortcut="Ctrl|Down"
+			shortcut="Shift|Ctrl|Down"
 			macShortcut="Ctrl|Down"
 			defaultHandler="TwinTechs.EditorExtensions.Commands.NextMember" />
 

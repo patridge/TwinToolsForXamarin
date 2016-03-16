@@ -42,35 +42,35 @@
 		<Command id="TwinTechs.EditorExtensions.Commands.CycleViewModelXamlCodeBehind"
 			_label="Cycle VM/Xaml/Code behind"
 			_description="Cycles between the vm and xaml file and code behind files"
-			shortcut="Shift|Meta|F8"
+			shortcut="Shift|Alt|F8"
 			macShortcut="Shift|Meta|F8"
 			defaultHandler="TwinTechs.EditorExtensions.Commands.CycleViewModelXamlCodeBehind" />
 
 		<Command id="TwinTechs.EditorExtensions.Commands.ToggleViewModel"
 			_label="Cycle VM/Xaml"
 			_description="Cycles between the vm and xaml file"
-			shortcut="Shift|Meta|F9"
+			shortcut="Shift|Alt|F9"
 			macShortcut="Shift|Meta|F9"
 			defaultHandler="TwinTechs.EditorExtensions.Commands.ToggleViewModel" />
 
 		<Command id="TwinTechs.EditorExtensions.Commands.ToggleVMAndCodeBehind"
 			_label="Cycle VM/Code-behind"
 			_description="Will cycle through the VM and code-behind file"
-			shortcut="Shift|Meta|F10"
+			shortcut="Shift|Alt|F10"
 			macShortcut="Shift|Meta|F10"
 			defaultHandler="TwinTechs.EditorExtensions.Commands.ToggleVMAndCodeBehind" />
 
 		<Command id="TwinTechs.EditorExtensions.Commands.ToggleUnitTestAndImplementation"
 			_label="Toggle Unit Tests"
 			_description="Will toggle the Unit test and implementation file"
-			shortcut="Alt|Meta|t"
+			shortcut="Alt|Ctrl|t"
 			macShortcut="Alt|Meta|t"
 			defaultHandler="TwinTechs.EditorExtensions.Commands.ToggleUnitTestAndImplementation" />
 
 		<Command id="TwinTechs.EditorExtensions.Commands.CreateUnitTestForMethod"
 			_label="Generate Unit Test"
 			_description="Create unit test for current method"
-			shortcut="Shift|Alt|Meta|t"
+			shortcut="Shift|Alt|Ctrl|t"
 			macShortcut="Shift|Alt|Meta|t"
 			defaultHandler="TwinTechs.EditorExtensions.Commands.CreateUnitTestForMethod" />
 

@@ -33,7 +33,7 @@ The add-in provides the following features:
   * Toggle class/unit test file, and go to correct method in each
   * Generate unit test for current method in implementation file
   
-Please check the default hotkeys and be prepared to reconfigure, as they are currently to my preference and may not be to yours.
+Please check the [default hotkeys and be prepared to reconfigure](#keyboard-shortcut-defaults).
 
 ## Overview
 
@@ -54,6 +54,41 @@ You will find an overview video here : [https://www.youtube.com/watch?v=_sYSDFR0
   * If a method is named `SomeMethod` then your tests must be called `TestSomeMethod` or `Test_SomeMethod`
   * You can have multiple methods, and add more stuff to the end of the name e.g. `Test_SomeMethod_InvalidEntryScenarios`
   * Generated methods are named `Test_MethodName`
+
+## Keyboard Shortcut Defaults
+
+Please check the default hotkeys and be prepared to reconfigure; they are currently a blend of IntelliJ and some work to avoid Xamarin Studio defaults on Win/Mac.
+
+  * Browse recent documents
+    * Mac: <kbd>Ctrl</kbd>+<kbd>E</kbd>
+    * Windows: <kbd>Ctrl</kbd>+<kbd>E</kbd>
+  * Go to Declaration+
+    * Mac: <kbd>Ctrl</kbd>+<kbd>D</kbd>
+    * Windows: <kbd>Alt</kbd>+<kbd>D</kbd>
+  * Show Members
+    * Mac: <kbd>Ctrl</kbd>+<kbd>F12</kbd>
+    * Windows: <kbd>Ctrl</kbd>+<kbd>F12</kbd>
+  * Previous/Next Member
+    * Mac: <kbd>Ctrl</kbd>+<kbd>Up</kbd> / <kbd>Ctrl</kbd>+<kbd>Down</kbd>
+    * Windows: <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Up</kbd> / <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Down</kbd>
+  * Cycle VM/Xaml/Code behind
+    * Mac: <kbd>Cmd</kbd>+<kbd>Shift</kbd>+<kbd>F8</kbd>
+    * Windows: <kbd>Alt</kbd>+<kbd>Shift</kbd>+<kbd>F8</kbd>
+  * Cycle VM/Xaml
+    * Mac: <kbd>Cmd</kbd>+<kbd>Shift</kbd>+<kbd>F9</kbd>
+    * Windows: <kbd>Alt</kbd>+<kbd>Shift</kbd>+<kbd>F9</kbd>
+  * Cycle VM/Code-behind
+    * Mac: <kbd>Cmd</kbd>+<kbd>Shift</kbd>+<kbd>F10</kbd>
+    * Windows: <kbd>Alt</kbd>+<kbd>Shift</kbd>+<kbd>F10</kbd>
+  * Toggle Unit Tests
+    * Mac: <kbd>Alt</kbd>+<kbd>Cmd</kbd>+<kbd>T</kbd>
+    * Windows: <kbd>Alt</kbd>+<kbd>Ctrl</kbd>+<kbd>T</kbd>
+  * Generate Unit Test
+    * Mac: <kbd>Alt</kbd>+<kbd>Cmd</kbd>+<kbd>Shift</kbd>+<kbd>T</kbd>
+    * Windows: {[still requires binding](https://github.com/twintechs/TwinToolsForXamarin/pull/4#issuecomment-197352035)}
+  * Fix Namespace
+    * Mac: <kbd>Alt</kbd>+<kbd>Cmd</kbd>+<kbd>N</kbd>
+    * Windows: <kbd>Alt</kbd>+<kbd>Ctrl</kbd>+<kbd>N</kbd>
   
 ## WIP features
 

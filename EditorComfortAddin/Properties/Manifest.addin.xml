@@ -28,14 +28,14 @@
 		<Command id="TwinTechs.EditorExtensions.Commands.PreviousMember"
 			_label="Previous Member"
 			_description="Goes to the previous member in a code file"
-			shortcut="Shift|Ctrl|Up"
+			shortcut="Shift|Ctrl|Alt|Up"
 			macShortcut="Ctrl|Up"
 			defaultHandler="TwinTechs.EditorExtensions.Commands.PreviousMember" />
 
 		<Command id="TwinTechs.EditorExtensions.Commands.NextMember"
 			_label="Next Member"
 			_description="Goes to the next member in a code file"
-			shortcut="Shift|Ctrl|Down"
+			shortcut="Shift|Ctrl|Alt|Down"
 			macShortcut="Ctrl|Down"
 			defaultHandler="TwinTechs.EditorExtensions.Commands.NextMember" />
 
